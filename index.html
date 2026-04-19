@@ -199,6 +199,7 @@
                     const reporterColIdx = 3; // D
                     const detailEColIdx = 4;  // E
                     const regColIdx = 5;      // F
+                    const infoHColIdx = 7;    // H (ข้อมูลเพิ่มเติม)
                     const openerColIdx = 13;  // N
                     
                     rows.forEach((row, index) => {
@@ -210,14 +211,36 @@
                             
                             const reporter = String(row.c[reporterColIdx]?.v || "").toUpperCase();
                             const detailE = String(row.c[detailEColIdx]?.v || "").toUpperCase();
+                            const infoH = String(row.c[infoHColIdx]?.v || "");
+                            
                             const isQC = reporter.includes("QC");
-                            const isSilentR = /^(R2|R3|R4|R5|R6|R7|R8|R9|R10|R11)\b/.test(detailE);
-                            const isSilentCase = isQC && isSilentR;
+                            
+                            let isSilentCase = false;
+
+                            if (isQC) {
+                                // กรณีเป็น R6
+                                if (detailE.startsWith("R6")) {
+                                    // ตรวจสอบ H ว่าลงท้ายด้วย (แก้ไขได้) หรือไม่
+                                    const canEdit = infoH.trim().endsWith("(แก้ไขได้)");
+                                    if (canEdit) {
+                                        // กรณี (แก้ไขได้): นับเป็นเคสใหม่ และแจ้งเตือนปกติ (isSilentCase = false)
+                                        isSilentCase = false;
+                                    } else {
+                                        // กรณีไม่มี (แก้ไขได้): นับเป็นเคสใหม่ แต่ไม่แจ้งเตือน
+                                        isSilentCase = true;
+                                    }
+                                } 
+                                // กรณี R อื่นๆ (R2-R5, R7-R11)
+                                else if (/^(R2|R3|R4|R5|R7|R8|R9|R10|R11)\b/.test(detailE)) {
+                                    isSilentCase = true;
+                                }
+                            }
                             
                             const openerValue = row.c[openerColIdx]?.v;
                             if (isNotEmpty(openerValue)) {
                                 completedCases++;
                             } else {
+                                // ถ้ายังไม่สำเร็จ ตรวจสอบว่าจะให้นับยอดแจ้งเตือน (กรอบส้ม) หรือไม่
                                 if (!isSilentCase) {
                                     notifyCount++; 
                                 }
@@ -310,16 +333,12 @@
             for (const name of targetSheets) {
                 const data = await fetchSheetData(id, name);
                 
-                // --- ตรรกะการแจ้งเตือนใหม่: ค้างไว้จนกว่าจะสำเร็จ ---
                 if (name === "L") {
-                    // สำหรับ Log L: แจ้งเตือนค้างไว้ถ้ามียอด notifyCount (เคสใหม่ที่ไม่ใช่ QC Silent) ค้างอยู่
                     notifications[name] = data.notifyCount > 0;
                 } else {
-                    // สำหรับ Log อื่นๆ: แจ้งเตือนค้างไว้ถ้าจำนวนเคสทั้งหมด > เคสที่ทำเสร็จ (คือยังเหลือเคสค้าง)
                     notifications[name] = data.total > data.completed;
                 }
 
-                // กรณีพิเศษ: ถ้าไม่มีข้อมูลเลย ให้ปิดการแจ้งเตือน
                 if (data.total === 0 || data.error) {
                     notifications[name] = false;
                 }
