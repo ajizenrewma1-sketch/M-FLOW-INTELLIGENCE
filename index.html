@@ -27,8 +27,8 @@
 
         .notification-border {
             border-color: rgba(249, 115, 22, 0.5);
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.1);
-            background: rgba(249, 115, 22, 0.03);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
+            background: rgba(249, 115, 22, 0.05);
         }
 
         @keyframes bounce-slow {
@@ -196,13 +196,13 @@
                     });
                 }
                 else if (sheetName === "L") {
-                    const reporterColIdx = 3; // คอลัมน์ D
-                    const detailEColIdx = 4;  // คอลัมน์ E
-                    const regColIdx = 5;      // คอลัมน์ F
-                    const openerColIdx = 13;  // คอลัมน์ N
+                    const reporterColIdx = 3; // D
+                    const detailEColIdx = 4;  // E
+                    const regColIdx = 5;      // F
+                    const openerColIdx = 13;  // N
                     
                     rows.forEach((row, index) => {
-                        if (index < 3) return; // ข้ามหัวตาราง
+                        if (index < 3) return; 
                         
                         const regValue = row.c[regColIdx]?.v;
                         if (isNotEmpty(regValue)) {
@@ -210,25 +210,16 @@
                             
                             const reporter = String(row.c[reporterColIdx]?.v || "").toUpperCase();
                             const detailE = String(row.c[detailEColIdx]?.v || "").toUpperCase();
-                            
-                            // เงื่อนไขตรวจสอบว่าเป็น QC หรือไม่
                             const isQC = reporter.includes("QC");
-                            
-                            // เงื่อนไขตรวจสอบรหัส R2-R11 ในคอลัมน์ E
-                            // ใช้ Regex ตรวจสอบ R ตามด้วยตัวเลข 2-11
                             const isSilentR = /^(R2|R3|R4|R5|R6|R7|R8|R9|R10|R11)\b/.test(detailE);
-                            
-                            // เงื่อนไขการ "นับแต่ไม่แจ้งเตือน": ต้องเป็น QC และมีรหัส R2-R11
                             const isSilentCase = isQC && isSilentR;
                             
                             const openerValue = row.c[openerColIdx]?.v;
                             if (isNotEmpty(openerValue)) {
                                 completedCases++;
                             } else {
-                                // ถ้ายังไม่เสร็จ (ยังไม่มีผู้ลงชื่อ) 
-                                // ตรวจสอบว่าต้องแจ้งเตือนหรือไม่
                                 if (!isSilentCase) {
-                                    notifyCount++; // นับเข้ายอดแจ้งเตือน (กรอบส้ม)
+                                    notifyCount++; 
                                 }
                             }
                         }
@@ -319,27 +310,17 @@
             for (const name of targetSheets) {
                 const data = await fetchSheetData(id, name);
                 
-                if (dashboardData[name]) {
-                    if (name === "L") {
-                        // แจ้งเตือนเมื่อมียอด notifyCount เพิ่มขึ้นเท่านั้น
-                        if (data.notifyCount > dashboardData[name].notifyCount) {
-                            notifications[name] = true;
-                        }
-                        else if (data.notifyCount < dashboardData[name].notifyCount) {
-                            notifications[name] = false;
-                        }
-                    } else {
-                        if (data.total > dashboardData[name].total && dashboardData[name].total !== 0) {
-                            notifications[name] = true;
-                        }
-                        else if (data.total <= dashboardData[name].total) {
-                            notifications[name] = false;
-                        }
-                    }
+                // --- ตรรกะการแจ้งเตือนใหม่: ค้างไว้จนกว่าจะสำเร็จ ---
+                if (name === "L") {
+                    // สำหรับ Log L: แจ้งเตือนค้างไว้ถ้ามียอด notifyCount (เคสใหม่ที่ไม่ใช่ QC Silent) ค้างอยู่
+                    notifications[name] = data.notifyCount > 0;
+                } else {
+                    // สำหรับ Log อื่นๆ: แจ้งเตือนค้างไว้ถ้าจำนวนเคสทั้งหมด > เคสที่ทำเสร็จ (คือยังเหลือเคสค้าง)
+                    notifications[name] = data.total > data.completed;
                 }
 
-                // ถ้าจัดการหมดแล้ว ให้เอาแจ้งเตือนออก
-                if (data.total === 0 || (data.total > 0 && data.total === data.completed) || (name === "L" && data.notifyCount === 0)) {
+                // กรณีพิเศษ: ถ้าไม่มีข้อมูลเลย ให้ปิดการแจ้งเตือน
+                if (data.total === 0 || data.error) {
                     notifications[name] = false;
                 }
                 
@@ -372,7 +353,6 @@
                 const card = document.createElement('div');
                 card.className = `group relative glass-card rounded-xl border transition-all duration-300 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5'}`;
                 
-                // ตรรกะการแสดงสถานะด้านล่าง
                 let footerContent = '';
                 if (name !== "L" && data.extra > 0) {
                     footerContent = `<span class="text-indigo-400">ข้อมูลเพิ่ม: ${data.extra}</span>`;
