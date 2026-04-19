@@ -82,30 +82,45 @@
                         <i data-lucide="zap" class="w-3 h-3 fill-current"></i>
                         ดึงข้อมูล
                     </button>
-                    <button 
-                        id="reset-btn"
-                        class="hidden bg-slate-800 hover:bg-slate-700 text-slate-400 p-1.5 rounded-lg transition-all"
-                    >
-                        <i data-lucide="layers" class="w-4 h-4"></i>
-                    </button>
+                    <div id="action-btns" class="hidden flex items-center gap-2">
+                        <button 
+                            id="instant-refresh-btn"
+                            title="รีเฟรชข้อมูลทันที"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white p-1.5 rounded-lg transition-all flex items-center gap-2 px-3 text-[10px] font-bold"
+                        >
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
+                            รีเฟรชทันที
+                        </button>
+                        <button 
+                            id="edit-btn"
+                            title="แก้ไข URL"
+                            class="bg-slate-800 hover:bg-slate-700 text-slate-400 p-1.5 rounded-lg transition-all"
+                        >
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <button 
+                            id="reset-btn"
+                            title="ล้างข้อมูลทั้งหมด"
+                            class="bg-slate-800 hover:bg-red-900/40 text-slate-400 hover:text-red-400 p-1.5 rounded-lg transition-all"
+                        >
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Error Message -->
         <div id="error-box" class="hidden mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-400 text-[10px] font-bold">
             <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
             <p id="error-msg"></p>
         </div>
 
-        <!-- Main Dashboard -->
         <main>
             <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2">
                 <!-- Cards will be injected here -->
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-slate-600"></i>
@@ -125,6 +140,7 @@
         let timer = null;
         let dashboardData = {};
         let notifications = {};
+        let isFetching = false;
         const targetSheets = ["AL อนุมัติผิด", "C", "L", "N", "L ชำระเงินแล้ว", "พินัยM9"];
 
         function initLucide() {
@@ -147,6 +163,7 @@
 
                 let totalCases = 0;
                 let completedCases = 0;
+                let notifyCount = 0;
                 let extra = 0;
 
                 if (sheetName === "AL อนุมัติผิด") {
@@ -175,18 +192,45 @@
                     });
                 }
                 else if (sheetName === "L") {
-                    const regColIdx = 5; const commentColIdx = 13;
+                    const reporterColIdx = 3; // D
+                    const detailEColIdx = 4;  // E
+                    const regColIdx = 5;      // F
+                    const openerColIdx = 13;  // N
+                    
                     rows.forEach((row, index) => {
-                        if (index < 4) return;
-                        const cell = row.c[regColIdx];
-                        const regValue = cell?.v;
-                        if (regValue !== null && regValue !== undefined && String(regValue).trim() !== "") {
+                        if (index < 3) return; 
+                        
+                        const regValue = row.c[regColIdx]?.v;
+                        if (regValue && String(regValue).trim() !== "") {
                             totalCases++;
-                            if (row.c[commentColIdx]?.v && String(row.c[commentColIdx].v).trim() !== "") completedCases++;
+                            
+                            if (row.c[openerColIdx]?.v && String(row.c[openerColIdx].v).trim() !== "") {
+                                completedCases++;
+                            }
+
+                            const reporter = String(row.c[reporterColIdx]?.v || "").toUpperCase();
+                            const detailE = String(row.c[detailEColIdx]?.v || "").toUpperCase();
+                            const isQC = reporter.includes("QC");
+                            const isSilentR = /^R(2|3|4|5|6|7|8|9|10|11)\b/.test(detailE);
+
+                            if (!(isQC && isSilentR)) {
+                                notifyCount++;
+                            }
                         }
                     });
                 }
-                else if (sheetName === "N" || sheetName === "L ชำระเงินแล้ว") {
+                else if (sheetName === "L ชำระเงินแล้ว") {
+                    const detailColIdx = 5; const openerColIdx = 9; 
+                    rows.forEach((row, index) => {
+                        if (index < 2) return; 
+                        const detailValue = row.c[detailColIdx]?.v;
+                        if (detailValue && String(detailValue).trim() !== "") {
+                            totalCases++;
+                            if (row.c[openerColIdx]?.v && String(row.c[openerColIdx].v).trim() !== "") completedCases++;
+                        }
+                    });
+                }
+                else if (sheetName === "N") {
                     const detailColIdx = 5; const closedByColIdx = 9;
                     rows.forEach((row, index) => {
                         if (index < 2) return;
@@ -212,8 +256,9 @@
                 return {
                     total: totalCases,
                     completed: completedCases,
+                    notifyCount: notifyCount,
                     extra: extra,
-                    lastUpdate: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+                    lastUpdate: new Date().toLocaleTimeString('th-TH'),
                     error: false
                 };
             } catch (err) {
@@ -223,39 +268,66 @@
         }
 
         async function updateDashboard(isAuto = false) {
+            if (isFetching) return;
+            isFetching = true;
+
             const idInput = document.getElementById('sheet-input');
-            const id = spreadsheetId || extractId(idInput.value);
+            // Check local storage if current spreadsheetId is empty
+            const savedId = localStorage.getItem('mflow_sheet_id');
+            const id = spreadsheetId || extractId(idInput.value) || savedId;
             
             if (!id) {
                 if (!isAuto) showError("กรุณาระบุ Link หรือ ID ให้ถูกต้อง");
+                isFetching = false;
                 return;
             }
 
             hideError();
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
             if (!isAuto) {
-                document.getElementById('refresh-btn').disabled = true;
-                document.getElementById('refresh-btn').innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> กำลังโหลด...';
+                const btn = document.getElementById('refresh-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> กำลังโหลด...';
                 initLucide();
             }
 
             spreadsheetId = id;
+            // Save to localStorage
+            localStorage.setItem('mflow_sheet_id', id);
+            
             document.getElementById('sheet-input').classList.add('hidden');
-            document.getElementById('reset-btn').classList.remove('hidden');
+            document.getElementById('refresh-btn').classList.add('hidden');
+            document.getElementById('action-btns').classList.remove('hidden');
 
-            const grid = document.getElementById('dashboard-grid');
             const results = {};
 
             for (const name of targetSheets) {
                 const data = await fetchSheetData(id, name);
                 
-                // Notification Logic
-                if (dashboardData[name] && data.total > dashboardData[name].total && dashboardData[name].total !== 0) {
-                    notifications[name] = true;
-                }
-                if (data.total > 0 && data.total === data.completed) {
-                    notifications[name] = false;
+                if (dashboardData[name]) {
+                    if (name === "L") {
+                        if (data.notifyCount > dashboardData[name].notifyCount && dashboardData[name].total !== 0) {
+                            notifications[name] = true;
+                        }
+                        else if (data.notifyCount <= dashboardData[name].notifyCount) {
+                            notifications[name] = false;
+                        }
+                    } else {
+                        if (data.total > dashboardData[name].total && dashboardData[name].total !== 0) {
+                            notifications[name] = true;
+                        }
+                        else if (data.total <= dashboardData[name].total) {
+                            notifications[name] = false;
+                        }
+                    }
                 }
 
+                if (data.total === 0 || (data.total > 0 && data.total === data.completed)) {
+                    notifications[name] = false;
+                }
+                
                 results[name] = data;
             }
 
@@ -263,10 +335,13 @@
             renderCards();
             
             document.getElementById('last-refresh-text').innerText = `อัปเดตล่าสุดเมื่อ: ${new Date().toLocaleTimeString('th-TH')}`;
-            document.getElementById('refresh-btn').disabled = false;
-            document.getElementById('refresh-btn').innerHTML = '<i data-lucide="zap" class="w-3 h-3 fill-current"></i> ดึงข้อมูล';
-            initLucide();
+            const mainRefreshBtn = document.getElementById('refresh-btn');
+            mainRefreshBtn.disabled = false;
+            mainRefreshBtn.innerHTML = '<i data-lucide="zap" class="w-3 h-3 fill-current"></i> ดึงข้อมูล';
+            if (refreshIcon) refreshIcon.classList.remove('animate-spin');
             
+            initLucide();
+            isFetching = false;
             countdown = 30;
             startTimer();
         }
@@ -336,6 +411,7 @@
         function startTimer() {
             if (timer) clearInterval(timer);
             timer = setInterval(() => {
+                if (isFetching) return;
                 countdown--;
                 document.getElementById('countdown').innerText = countdown;
                 if (countdown <= 0) {
@@ -354,24 +430,39 @@
             document.getElementById('error-box').classList.add('hidden');
         }
 
-        // Event Listeners
         document.getElementById('refresh-btn').addEventListener('click', () => updateDashboard(false));
+        document.getElementById('instant-refresh-btn').addEventListener('click', () => updateDashboard(false));
         
+        document.getElementById('edit-btn').addEventListener('click', () => {
+            document.getElementById('sheet-input').classList.remove('hidden');
+            document.getElementById('refresh-btn').classList.remove('hidden');
+            document.getElementById('action-btns').classList.add('hidden');
+            if (timer) clearInterval(timer);
+        });
+
         document.getElementById('reset-btn').addEventListener('click', () => {
             spreadsheetId = '';
+            localStorage.removeItem('mflow_sheet_id');
             dashboardData = {};
             notifications = {};
             if (timer) clearInterval(timer);
+            document.getElementById('sheet-input').value = '';
             document.getElementById('sheet-input').classList.remove('hidden');
-            document.getElementById('reset-btn').classList.add('hidden');
+            document.getElementById('refresh-btn').classList.remove('hidden');
+            document.getElementById('action-btns').classList.add('hidden');
             document.getElementById('dashboard-grid').innerHTML = '';
             document.getElementById('last-refresh-text').innerText = 'รอดำเนินการดึงข้อมูล...';
             initLucide();
         });
 
-        // Initialize
-        window.onload = () => {
-            initLucide();
+        window.onload = () => { 
+            initLucide(); 
+            // Check if there's a saved ID on load
+            const savedId = localStorage.getItem('mflow_sheet_id');
+            if (savedId) {
+                spreadsheetId = savedId;
+                updateDashboard(true);
+            }
         };
     </script>
 </body>
