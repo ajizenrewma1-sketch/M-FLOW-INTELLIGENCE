@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M-Flow Intelligence Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.2); border-radius: 10px; }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .notification-border {
+            border-color: rgba(249, 115, 22, 0.5);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.1);
+            background: rgba(249, 115, 22, 0.03);
+        }
+
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-2">
+    <!-- Background Decor -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-0 w-[30%] h-[30%] bg-indigo-500/5 blur-[80px] rounded-full"></div>
+        <div class="absolute bottom-0 right-0 w-[20%] h-[20%] bg-emerald-500/5 blur-[80px] rounded-full"></div>
+    </div>
+
+    <div id="app" class="relative z-10 max-w-full mx-auto">
+        <!-- Header -->
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/40 backdrop-blur-xl p-3 rounded-xl border border-white/5 shadow-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-600 rounded-lg shadow-lg">
+                        <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-black bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight leading-none uppercase">
+                            M-FLOW INTELLIGENCE
+                        </h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                <i data-lucide="timer" class="w-2.5 h-2.5"></i>
+                                อัตโนมัติ: <span id="countdown">30</span> วินาที
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2" id="input-area">
+                    <input 
+                        type="text" 
+                        id="sheet-input"
+                        placeholder="ระบุ ID แผ่นงาน..."
+                        class="bg-slate-800/50 border border-slate-700/50 rounded-lg py-1.5 px-3 text-xs focus:outline-none w-48 transition-all placeholder:text-slate-600"
+                    >
+                    <button 
+                        id="refresh-btn"
+                        class="bg-white text-slate-900 px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-indigo-50 active:scale-95 flex items-center gap-2"
+                    >
+                        <i data-lucide="zap" class="w-3 h-3 fill-current"></i>
+                        ดึงข้อมูล
+                    </button>
+                    <button 
+                        id="reset-btn"
+                        class="hidden bg-slate-800 hover:bg-slate-700 text-slate-400 p-1.5 rounded-lg transition-all"
+                    >
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Error Message -->
+        <div id="error-box" class="hidden mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-400 text-[10px] font-bold">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+            <p id="error-msg"></p>
+        </div>
+
+        <!-- Main Dashboard -->
+        <main>
+            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2">
+                <!-- Cards will be injected here -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-slate-600"></i>
+                <p id="last-refresh-text" class="text-[9px] text-indigo-400 font-bold uppercase tracking-widest">
+                    รอดำเนินการดึงข้อมูล...
+                </p>
+            </div>
+            <div class="text-[8px] font-bold text-slate-600 uppercase tracking-widest">
+                M-FLOW SYSTEM READY
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let spreadsheetId = '';
+        let countdown = 30;
+        let timer = null;
+        let dashboardData = {};
+        let notifications = {};
+        const targetSheets = ["AL อนุมัติผิด", "C", "L", "N", "L ชำระเงินแล้ว", "พินัยM9"];
+
+        function initLucide() {
+            lucide.createIcons();
+        }
+
+        function extractId(url) {
+            const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            return matches ? matches[1] : url;
+        }
+
+        async function fetchSheetData(id, sheetName) {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+                const response = await fetch(url);
+                const text = await response.text();
+                const jsonData = JSON.parse(text.substring(47, text.length - 2));
+                const rows = jsonData.table.rows;
+                const cols = jsonData.table.cols;
+
+                let totalCases = 0;
+                let completedCases = 0;
+                let extra = 0;
+
+                if (sheetName === "AL อนุมัติผิด") {
+                    const alprColIndex = cols.findIndex(c => c.label && c.label.includes("ทะเบียนที่ ALPR อนุมัติผิด"));
+                    const targetIdx = alprColIndex !== -1 ? alprColIndex : 1; 
+                    const inspectorColIdx = 13; 
+                    rows.forEach(row => {
+                        const cellValue = row.c[targetIdx]?.v;
+                        if (cellValue && String(cellValue).trim() !== "") {
+                            totalCases++;
+                            if (row.c[inspectorColIdx]?.v && String(row.c[inspectorColIdx].v).trim() !== "") completedCases++;
+                        }
+                    });
+                } 
+                else if (sheetName === "C") {
+                    const detailColIdx = 5; const opColIdx = 9;
+                    rows.forEach((row, index) => {
+                        if (index < 2) return;
+                        const detailValue = row.c[detailColIdx]?.v;
+                        if (detailValue && String(detailValue).trim() !== "") {
+                            totalCases++;
+                            if (row.c[opColIdx]?.v && String(row.c[opColIdx].v).trim() !== "") completedCases++;
+                            const rowText = row.c.map(cell => String(cell?.v || "").toLowerCase()).join(" ");
+                            if (rowText.includes("ข้อมูลเพิ่ม") || rowText.includes("ม่วง")) extra++;
+                        }
+                    });
+                }
+                else if (sheetName === "L") {
+                    const regColIdx = 5; const commentColIdx = 13;
+                    rows.forEach((row, index) => {
+                        if (index < 4) return;
+                        const cell = row.c[regColIdx];
+                        const regValue = cell?.v;
+                        if (regValue !== null && regValue !== undefined && String(regValue).trim() !== "") {
+                            totalCases++;
+                            if (row.c[commentColIdx]?.v && String(row.c[commentColIdx].v).trim() !== "") completedCases++;
+                        }
+                    });
+                }
+                else if (sheetName === "N" || sheetName === "L ชำระเงินแล้ว") {
+                    const detailColIdx = 5; const closedByColIdx = 9;
+                    rows.forEach((row, index) => {
+                        if (index < 2) return;
+                        const detailValue = row.c[detailColIdx]?.v;
+                        if (detailValue && String(detailValue).trim() !== "") {
+                            totalCases++;
+                            if (row.c[closedByColIdx]?.v && String(row.c[closedByColIdx].v).trim() !== "") completedCases++;
+                        }
+                    });
+                }
+                else if (sheetName === "พินัยM9") {
+                    const detailColIdx = 4; const closedByColIdx = 8;
+                    rows.forEach((row, index) => {
+                        if (index < 2) return;
+                        const detailValue = row.c[detailColIdx]?.v;
+                        if (detailValue && String(detailValue).trim() !== "") {
+                            totalCases++;
+                            if (row.c[closedByColIdx]?.v && String(row.c[closedByColIdx].v).trim() !== "") completedCases++;
+                        }
+                    });
+                }
+                
+                return {
+                    total: totalCases,
+                    completed: completedCases,
+                    extra: extra,
+                    lastUpdate: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+                    error: false
+                };
+            } catch (err) {
+                console.error(err);
+                return { total: 0, completed: 0, error: true };
+            }
+        }
+
+        async function updateDashboard(isAuto = false) {
+            const idInput = document.getElementById('sheet-input');
+            const id = spreadsheetId || extractId(idInput.value);
+            
+            if (!id) {
+                if (!isAuto) showError("กรุณาระบุ Link หรือ ID ให้ถูกต้อง");
+                return;
+            }
+
+            hideError();
+            if (!isAuto) {
+                document.getElementById('refresh-btn').disabled = true;
+                document.getElementById('refresh-btn').innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> กำลังโหลด...';
+                initLucide();
+            }
+
+            spreadsheetId = id;
+            document.getElementById('sheet-input').classList.add('hidden');
+            document.getElementById('reset-btn').classList.remove('hidden');
+
+            const grid = document.getElementById('dashboard-grid');
+            const results = {};
+
+            for (const name of targetSheets) {
+                const data = await fetchSheetData(id, name);
+                
+                // Notification Logic
+                if (dashboardData[name] && data.total > dashboardData[name].total && dashboardData[name].total !== 0) {
+                    notifications[name] = true;
+                }
+                if (data.total > 0 && data.total === data.completed) {
+                    notifications[name] = false;
+                }
+
+                results[name] = data;
+            }
+
+            dashboardData = results;
+            renderCards();
+            
+            document.getElementById('last-refresh-text').innerText = `อัปเดตล่าสุดเมื่อ: ${new Date().toLocaleTimeString('th-TH')}`;
+            document.getElementById('refresh-btn').disabled = false;
+            document.getElementById('refresh-btn').innerHTML = '<i data-lucide="zap" class="w-3 h-3 fill-current"></i> ดึงข้อมูล';
+            initLucide();
+            
+            countdown = 30;
+            startTimer();
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('dashboard-grid');
+            grid.innerHTML = '';
+
+            Object.entries(dashboardData).forEach(([name, data]) => {
+                const isNotified = notifications[name];
+                const percent = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
+                
+                const card = document.createElement('div');
+                card.className = `group relative glass-card rounded-xl border transition-all duration-300 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5'}`;
+                
+                card.innerHTML = `
+                    <div class="p-3">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="space-y-0.5">
+                                <p class="text-[8px] font-black uppercase tracking-widest ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">Log</p>
+                                <h3 class="text-xs font-bold text-white truncate max-w-[90px]">${name}</h3>
+                            </div>
+                            <div class="p-1.5 rounded-lg ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/50 text-slate-500'}">
+                                <i data-lucide="${isNotified ? 'bell-ring' : 'file-spreadsheet'}" class="w-3.5 h-3.5 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
+                            </div>
+                        </div>
+
+                        ${data.error ? 
+                            `<div class="py-6 text-center text-slate-600 text-[10px] font-medium italic">ไม่สามารถเชื่อมต่อได้</div>` : 
+                            `<div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="p-2 rounded-lg bg-slate-800/30 border border-white/5">
+                                        <p class="text-lg font-black text-white leading-none tracking-tighter">${data.total}</p>
+                                        <p class="text-[7px] font-bold text-slate-500 uppercase mt-1">จำนวนเคสทั้งหมด</p>
+                                    </div>
+                                    <div class="p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-right">
+                                        <p class="text-lg font-black text-emerald-400 leading-none tracking-tighter">${data.completed}</p>
+                                        <p class="text-[7px] font-bold text-emerald-600/70 uppercase mt-1">จำนวนเคสที่เสร็จสิ้น</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[8px] font-bold text-slate-500 uppercase">เปอร์เซ็นสำเร็จ</span>
+                                        <span class="text-[10px] font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">${percent}%</span>
+                                    </div>
+                                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-1000 ${isNotified ? 'bg-orange-500' : 'bg-indigo-600'}" style="width: ${percent}%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[8px] text-slate-600 font-bold uppercase tracking-tighter">
+                                   <span class="flex items-center gap-1">
+                                     <i data-lucide="clock" class="w-2.5 h-2.5 opacity-50"></i> ${data.lastUpdate}
+                                   </span>
+                                   ${data.extra > 0 ? `<span class="text-indigo-400">ข้อมูลเพิ่ม: ${data.extra}</span>` : ''}
+                                </div>
+                            </div>`
+                        }
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            initLucide();
+        }
+
+        function startTimer() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').innerText = countdown;
+                if (countdown <= 0) {
+                    updateDashboard(true);
+                }
+            }, 1000);
+        }
+
+        function showError(msg) {
+            const box = document.getElementById('error-box');
+            document.getElementById('error-msg').innerText = msg;
+            box.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error-box').classList.add('hidden');
+        }
+
+        // Event Listeners
+        document.getElementById('refresh-btn').addEventListener('click', () => updateDashboard(false));
+        
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            spreadsheetId = '';
+            dashboardData = {};
+            notifications = {};
+            if (timer) clearInterval(timer);
+            document.getElementById('sheet-input').classList.remove('hidden');
+            document.getElementById('reset-btn').classList.add('hidden');
+            document.getElementById('dashboard-grid').innerHTML = '';
+            document.getElementById('last-refresh-text').innerText = 'รอดำเนินการดึงข้อมูล...';
+            initLucide();
+        });
+
+        // Initialize
+        window.onload = () => {
+            initLucide();
+        };
+    </script>
+</body>
+</html>
