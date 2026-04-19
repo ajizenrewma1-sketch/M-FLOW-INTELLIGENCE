@@ -152,6 +152,10 @@
             return matches ? matches[1] : url;
         }
 
+        function isNotEmpty(value) {
+            return value !== null && value !== undefined && String(value).trim().length > 0;
+        }
+
         async function fetchSheetData(id, sheetName) {
             try {
                 const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
@@ -172,9 +176,9 @@
                     const inspectorColIdx = 13; 
                     rows.forEach(row => {
                         const cellValue = row.c[targetIdx]?.v;
-                        if (cellValue && String(cellValue).trim() !== "") {
+                        if (isNotEmpty(cellValue)) {
                             totalCases++;
-                            if (row.c[inspectorColIdx]?.v && String(row.c[inspectorColIdx].v).trim() !== "") completedCases++;
+                            if (isNotEmpty(row.c[inspectorColIdx]?.v)) completedCases++;
                         }
                     });
                 } 
@@ -183,38 +187,49 @@
                     rows.forEach((row, index) => {
                         if (index < 2) return;
                         const detailValue = row.c[detailColIdx]?.v;
-                        if (detailValue && String(detailValue).trim() !== "") {
+                        if (isNotEmpty(detailValue)) {
                             totalCases++;
-                            if (row.c[opColIdx]?.v && String(row.c[opColIdx].v).trim() !== "") completedCases++;
+                            if (isNotEmpty(row.c[opColIdx]?.v)) completedCases++;
                             const rowText = row.c.map(cell => String(cell?.v || "").toLowerCase()).join(" ");
                             if (rowText.includes("ข้อมูลเพิ่ม") || rowText.includes("ม่วง")) extra++;
                         }
                     });
                 }
                 else if (sheetName === "L") {
-                    const reporterColIdx = 3; // D
-                    const detailEColIdx = 4;  // E
-                    const regColIdx = 5;      // F
-                    const openerColIdx = 13;  // N
+                    const reporterColIdx = 3; // คอลัมน์ D
+                    const detailEColIdx = 4;  // คอลัมน์ E
+                    const regColIdx = 5;      // คอลัมน์ F
+                    const openerColIdx = 13;  // คอลัมน์ N
                     
                     rows.forEach((row, index) => {
-                        if (index < 3) return; 
+                        if (index < 3) return; // ข้ามหัวตาราง
                         
                         const regValue = row.c[regColIdx]?.v;
-                        if (regValue && String(regValue).trim() !== "") {
+                        if (isNotEmpty(regValue)) {
                             totalCases++;
                             
-                            if (row.c[openerColIdx]?.v && String(row.c[openerColIdx].v).trim() !== "") {
-                                completedCases++;
-                            }
-
                             const reporter = String(row.c[reporterColIdx]?.v || "").toUpperCase();
                             const detailE = String(row.c[detailEColIdx]?.v || "").toUpperCase();
+                            
+                            // เงื่อนไขตรวจสอบว่าเป็น QC หรือไม่
                             const isQC = reporter.includes("QC");
-                            const isSilentR = /^R(2|3|4|5|6|7|8|9|10|11)\b/.test(detailE);
-
-                            if (!(isQC && isSilentR)) {
-                                notifyCount++;
+                            
+                            // เงื่อนไขตรวจสอบรหัส R2-R11 ในคอลัมน์ E
+                            // ใช้ Regex ตรวจสอบ R ตามด้วยตัวเลข 2-11
+                            const isSilentR = /^(R2|R3|R4|R5|R6|R7|R8|R9|R10|R11)\b/.test(detailE);
+                            
+                            // เงื่อนไขการ "นับแต่ไม่แจ้งเตือน": ต้องเป็น QC และมีรหัส R2-R11
+                            const isSilentCase = isQC && isSilentR;
+                            
+                            const openerValue = row.c[openerColIdx]?.v;
+                            if (isNotEmpty(openerValue)) {
+                                completedCases++;
+                            } else {
+                                // ถ้ายังไม่เสร็จ (ยังไม่มีผู้ลงชื่อ) 
+                                // ตรวจสอบว่าต้องแจ้งเตือนหรือไม่
+                                if (!isSilentCase) {
+                                    notifyCount++; // นับเข้ายอดแจ้งเตือน (กรอบส้ม)
+                                }
                             }
                         }
                     });
@@ -224,9 +239,9 @@
                     rows.forEach((row, index) => {
                         if (index < 2) return; 
                         const detailValue = row.c[detailColIdx]?.v;
-                        if (detailValue && String(detailValue).trim() !== "") {
+                        if (isNotEmpty(detailValue)) {
                             totalCases++;
-                            if (row.c[openerColIdx]?.v && String(row.c[openerColIdx].v).trim() !== "") completedCases++;
+                            if (isNotEmpty(row.c[openerColIdx]?.v)) completedCases++;
                         }
                     });
                 }
@@ -235,9 +250,9 @@
                     rows.forEach((row, index) => {
                         if (index < 2) return;
                         const detailValue = row.c[detailColIdx]?.v;
-                        if (detailValue && String(detailValue).trim() !== "") {
+                        if (isNotEmpty(detailValue)) {
                             totalCases++;
-                            if (row.c[closedByColIdx]?.v && String(row.c[closedByColIdx].v).trim() !== "") completedCases++;
+                            if (isNotEmpty(row.c[closedByColIdx]?.v)) completedCases++;
                         }
                     });
                 }
@@ -246,9 +261,9 @@
                     rows.forEach((row, index) => {
                         if (index < 2) return;
                         const detailValue = row.c[detailColIdx]?.v;
-                        if (detailValue && String(detailValue).trim() !== "") {
+                        if (isNotEmpty(detailValue)) {
                             totalCases++;
-                            if (row.c[closedByColIdx]?.v && String(row.c[closedByColIdx].v).trim() !== "") completedCases++;
+                            if (isNotEmpty(row.c[closedByColIdx]?.v)) completedCases++;
                         }
                     });
                 }
@@ -272,7 +287,6 @@
             isFetching = true;
 
             const idInput = document.getElementById('sheet-input');
-            // Check local storage if current spreadsheetId is empty
             const savedId = localStorage.getItem('mflow_sheet_id');
             const id = spreadsheetId || extractId(idInput.value) || savedId;
             
@@ -294,7 +308,6 @@
             }
 
             spreadsheetId = id;
-            // Save to localStorage
             localStorage.setItem('mflow_sheet_id', id);
             
             document.getElementById('sheet-input').classList.add('hidden');
@@ -308,10 +321,11 @@
                 
                 if (dashboardData[name]) {
                     if (name === "L") {
-                        if (data.notifyCount > dashboardData[name].notifyCount && dashboardData[name].total !== 0) {
+                        // แจ้งเตือนเมื่อมียอด notifyCount เพิ่มขึ้นเท่านั้น
+                        if (data.notifyCount > dashboardData[name].notifyCount) {
                             notifications[name] = true;
                         }
-                        else if (data.notifyCount <= dashboardData[name].notifyCount) {
+                        else if (data.notifyCount < dashboardData[name].notifyCount) {
                             notifications[name] = false;
                         }
                     } else {
@@ -324,7 +338,8 @@
                     }
                 }
 
-                if (data.total === 0 || (data.total > 0 && data.total === data.completed)) {
+                // ถ้าจัดการหมดแล้ว ให้เอาแจ้งเตือนออก
+                if (data.total === 0 || (data.total > 0 && data.total === data.completed) || (name === "L" && data.notifyCount === 0)) {
                     notifications[name] = false;
                 }
                 
@@ -357,6 +372,12 @@
                 const card = document.createElement('div');
                 card.className = `group relative glass-card rounded-xl border transition-all duration-300 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5'}`;
                 
+                // ตรรกะการแสดงสถานะด้านล่าง
+                let footerContent = '';
+                if (name !== "L" && data.extra > 0) {
+                    footerContent = `<span class="text-indigo-400">ข้อมูลเพิ่ม: ${data.extra}</span>`;
+                }
+
                 card.innerHTML = `
                     <div class="p-3">
                         <div class="flex justify-between items-start mb-3">
@@ -397,7 +418,7 @@
                                    <span class="flex items-center gap-1">
                                      <i data-lucide="clock" class="w-2.5 h-2.5 opacity-50"></i> ${data.lastUpdate}
                                    </span>
-                                   ${data.extra > 0 ? `<span class="text-indigo-400">ข้อมูลเพิ่ม: ${data.extra}</span>` : ''}
+                                   ${footerContent}
                                 </div>
                             </div>`
                         }
@@ -457,7 +478,6 @@
 
         window.onload = () => { 
             initLucide(); 
-            // Check if there's a saved ID on load
             const savedId = localStorage.getItem('mflow_sheet_id');
             if (savedId) {
                 spreadsheetId = savedId;
