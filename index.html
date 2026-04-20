@@ -77,34 +77,53 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Futuristic Progress Bar */
+        /* Futuristic Progress Bar - Improved Size & Dynamic Loading Animation */
         .progress-container {
             background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            height: 8px;
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 14px; /* ปรับขนาดให้ใหญ่ขึ้นอีกนิด */
+            border-radius: 8px;
             overflow: hidden;
             position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
         }
 
         .progress-fill {
             height: 100%;
             transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1);
             position: relative;
-            border-radius: 4px;
+            border-radius: 8px;
         }
 
+        /* Loading Shine Effect - วิ่งตลอดเวลาเหมือนประมวลผล */
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(
+                90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0) 30%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                rgba(255, 255, 255, 0) 70%, 
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            animation: scan-loading 2.5s infinite linear;
+        }
+
+        /* กราฟิกตารางเล็กๆ ในตัวหลอด (เพื่อความเท่แต่ไม่ลายตา) */
         .progress-fill::after {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: scan 2.5s infinite linear;
+            background-image: linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 15% 100%;
         }
 
-        @keyframes scan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        @keyframes scan-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .stat-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -201,7 +220,7 @@
                     </div>
                     <div class="relative z-10">
                         <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">การแจ้งเตือนชีทที่ซ่อน</p>
-                        <p id="alert-status-text" class="text-[9px] font-bold text-slate-500 mt-0.5 uppercase truncate max-w-[100px]">Operational</p>
+                        <p id="alert-status-text" class="text-[9px] font-bold text-slate-500 mt-0.5 uppercase truncate max-w-[100px]">AL ไม่มีเคสใหม่</p>
                     </div>
                     <div class="p-1.5 bg-slate-500/10 rounded-lg group-hover:bg-slate-500/20 transition-all relative z-10">
                         <i data-lucide="activity" class="text-slate-400 w-4 h-4"></i>
@@ -244,26 +263,23 @@
                     rows.forEach((r, idx) => { if(r.c && isNotEmpty(r.c[3]?.v)) { total++; if(isNotEmpty(r.c[13]?.v)) completed++; else { notify++; alertRows.push(idx + 1); } }});
                 } else if (sheetName === "L") {
                     rows.slice(3).forEach((r, idx) => { 
-                        if(r.c && isNotEmpty(r.c[5]?.v)) { // เช็คหลักที่คอลัมน์ F (Index 5)
+                        if(r.c && isNotEmpty(r.c[5]?.v)) {
                             total++; 
-                            const isDone = isNotEmpty(r.c[13]?.v); // คอลัมน์ N (Index 13)
+                            const isDone = isNotEmpty(r.c[13]?.v);
                             
                             if (isDone) {
                                 completed++;
                             } else {
-                                // Logic ตรวจสอบการแจ้งเตือนเพิ่มเติม
-                                const colD = String(r.c[3]?.v || "").toUpperCase(); // Index 3
-                                const colE = String(r.c[4]?.v || "").toUpperCase(); // Index 4
-                                const colH = String(r.c[7]?.v || ""); // Index 7
+                                const colD = String(r.c[3]?.v || "").toUpperCase();
+                                const colE = String(r.c[4]?.v || "").toUpperCase();
+                                const colH = String(r.c[7]?.v || "");
                                 
                                 let shouldNotify = true;
 
                                 if (colD.includes("QC")) {
                                     if (colE.startsWith("R6")) {
-                                        // Case R6: แจ้งเตือนเฉพาะที่มีคำว่า "แก้ไข" ใน H
                                         shouldNotify = colH.includes("แก้ไข");
                                     } else if (["R2","R3","R4","R5","R7","R8","R9","R10","R11"].some(rx => colE.startsWith(rx))) {
-                                        // Case R2-R11 (ยกเว้น R6): ไม่ต้องแจ้งเตือน
                                         shouldNotify = false;
                                     }
                                 }
@@ -368,7 +384,6 @@
             alprContainer.classList.toggle('hidden', !alpr);
             alertSummaryCard.classList.toggle('alert-glow', alpr);
             
-            // อัปเดตข้อความตามเงื่อนไขที่ผู้ใช้ต้องการ
             if (alpr) {
                 alertStatusText.innerText = 'ALPR ACTION';
                 alertStatusText.className = 'text-[9px] font-bold mt-0.5 uppercase text-orange-500';
