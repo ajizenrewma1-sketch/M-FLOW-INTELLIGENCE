@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
         
         body {
             font-family: 'Sarabun', sans-serif;
@@ -32,7 +32,6 @@
             background: rgba(249, 115, 22, 0.08);
         }
 
-        /* Animation หลักของแถบพลังงาน */
         @keyframes progress-scan {
             0% { transform: translateX(-100%); opacity: 0; }
             50% { opacity: 1; }
@@ -56,7 +55,6 @@
             animation: pulse-glow 3s infinite ease-in-out;
         }
 
-        /* แสงวิ่งผ่าน (Cyber Shimmer) */
         .progress-bar-smart::before {
             content: "";
             position: absolute;
@@ -64,16 +62,10 @@
             left: 0;
             width: 40%;
             height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.4),
-                transparent
-            );
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             animation: progress-scan 2s infinite ease-in-out;
         }
 
-        /* เอฟเฟกต์ลายทาง (Stripes) */
         .progress-bar-smart::after {
             content: "";
             position: absolute;
@@ -81,29 +73,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.1) 25%,
-                transparent 25%,
-                transparent 50%,
-                rgba(255, 255, 255, 0.1) 50%,
-                rgba(255, 255, 255, 0.1) 75%,
-                transparent 75%,
-                transparent
-            );
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
             background-size: 1rem 1rem;
         }
 
         @keyframes bounce-slow {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
+            50% { transform: translateY(-2px); }
         }
         .animate-bounce-slow {
             animation: bounce-slow 2s infinite;
         }
     </style>
 </head>
-<body class="min-h-screen p-3">
+<body class="min-h-screen p-2.5">
     <!-- Background Decor -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-0 left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
@@ -111,24 +94,23 @@
     </div>
 
     <div id="app" class="relative z-10 max-w-full mx-auto">
-        <!-- Header -->
-        <header class="mb-4">
-            <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900/60 backdrop-blur-2xl p-4 rounded-2xl border border-white/10 shadow-2xl">
-                <div class="flex items-center gap-4">
-                    <div class="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-lg shadow-indigo-500/20">
-                        <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+        <header class="mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 backdrop-blur-2xl p-3 rounded-xl border border-white/10 shadow-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow-lg">
+                        <i data-lucide="activity" class="w-5 h-5 text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-black bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tighter leading-none uppercase">
+                        <h1 class="text-lg font-black bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tighter leading-none uppercase">
                             M-FLOW INTELLIGENCE
                         </h1>
-                        <div class="flex items-center gap-2 mt-1.5">
-                            <span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                                <span class="relative flex h-2 w-2">
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="flex items-center gap-1.5 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
+                                <span class="relative flex h-1.5 w-1.5">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                                 </span>
-                                รีเฟรชอัตโนมัติ: <span id="countdown">30</span> วิ
+                                รีเฟรช: <span id="countdown">30</span> วินาที
                             </span>
                         </div>
                     </div>
@@ -138,58 +120,49 @@
                     <input 
                         type="text" 
                         id="sheet-input"
-                        placeholder="วาง Link Google Sheets ที่นี่..."
-                        class="bg-slate-800/80 border border-slate-700 rounded-xl py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-64 transition-all placeholder:text-slate-500"
+                        placeholder="วาง Link Google Sheets..."
+                        class="bg-slate-800/80 border border-slate-700 rounded-lg py-1.5 px-3 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-56 transition-all placeholder:text-slate-500"
                     >
                     <button 
                         id="refresh-btn"
-                        class="bg-white text-slate-900 px-5 py-2 rounded-xl text-sm font-black transition-all hover:bg-indigo-50 active:scale-95 flex items-center gap-2 shadow-lg"
+                        class="bg-white text-slate-900 px-4 py-1.5 rounded-lg text-[11px] font-black transition-all hover:bg-indigo-50 active:scale-95 flex items-center gap-2 shadow-lg"
                     >
-                        <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i>
                         CONNECT
                     </button>
-                    <div id="action-btns" class="hidden flex items-center gap-2">
+                    <div id="action-btns" class="hidden flex items-center gap-1.5">
                         <button 
                             id="instant-refresh-btn"
-                            class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-xl transition-all flex items-center gap-2 px-4 text-xs font-bold"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white p-1.5 rounded-lg transition-all flex items-center gap-1.5 px-3 text-[10px] font-bold"
                         >
-                            <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
                             รีเฟรชข้อมูล
                         </button>
-                        <button id="edit-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl transition-all border border-white/5">
-                            <i data-lucide="settings-2" class="w-5 h-5"></i>
+                        <button id="edit-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-1.5 rounded-lg border border-white/5">
+                            <i data-lucide="settings-2" class="w-4 h-4"></i>
                         </button>
-                        <button id="reset-btn" class="bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 p-2 rounded-xl transition-all border border-white/5">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        <button id="reset-btn" class="bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 p-1.5 rounded-lg border border-white/5">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div id="error-box" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-xs font-bold animate-pulse">
-            <i data-lucide="alert-octagon" class="w-5 h-5"></i>
-            <p id="error-msg"></p>
-        </div>
-
         <main>
-            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5">
                 <!-- Cards will be injected here -->
             </div>
         </main>
 
-        <footer class="mt-6 pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="flex -space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-indigo-600 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold">M</div>
-                    <div class="w-6 h-6 rounded-full bg-emerald-600 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold">F</div>
-                </div>
-                <p id="last-refresh-text" class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                    SYSTEM READY · STANDBY
+        <footer class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <p id="last-refresh-text" class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                    SYSTEM STANDBY
                 </p>
             </div>
-            <div class="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em]">
-                Secure Intelligence Protocol v2.5
+            <div class="text-[9px] font-black text-slate-700 uppercase tracking-[0.2em]">
+                Secure Protocol v2.5
             </div>
         </footer>
     </div>
@@ -203,15 +176,11 @@
         let isFetching = false;
         const targetSheets = ["AL อนุมัติผิด", "C", "L", "N", "L ชำระเงินแล้ว", "พินัยM9"];
 
-        function initLucide() {
-            lucide.createIcons();
-        }
-
+        function initLucide() { lucide.createIcons(); }
         function extractId(url) {
             const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
             return matches ? matches[1] : url;
         }
-
         function isNotEmpty(value) {
             return value !== null && value !== undefined && String(value).trim().length > 0;
         }
@@ -225,10 +194,7 @@
                 const rows = jsonData.table.rows;
                 const cols = jsonData.table.cols;
 
-                let totalCases = 0;
-                let completedCases = 0;
-                let notifyCount = 0;
-                let extra = 0;
+                let totalCases = 0, completedCases = 0, notifyCount = 0, extra = 0;
 
                 if (sheetName === "AL อนุมัติผิด") {
                     const alprColIndex = cols.findIndex(c => c.label && c.label.includes("ทะเบียนที่ ALPR อนุมัติผิด"));
@@ -256,9 +222,7 @@
                     });
                 }
                 else if (sheetName === "L") {
-                    const reporterColIdx = 3; const detailEColIdx = 4; const regColIdx = 5;
-                    const infoHColIdx = 7; const openerColIdx = 13;
-                    
+                    const reporterColIdx = 3, detailEColIdx = 4, regColIdx = 5, infoHColIdx = 7, openerColIdx = 13;
                     rows.forEach((row, index) => {
                         if (index < 3) return; 
                         const regValue = row.c[regColIdx]?.v;
@@ -285,7 +249,7 @@
                     });
                 }
                 else if (sheetName === "L ชำระเงินแล้ว" || sheetName === "N") {
-                    const detailColIdx = 5; const openerColIdx = 9; 
+                    const detailColIdx = 5, openerColIdx = 9; 
                     rows.forEach((row, index) => {
                         if (index < 2) return; 
                         const detailValue = row.c[detailColIdx]?.v;
@@ -296,7 +260,7 @@
                     });
                 }
                 else if (sheetName === "พินัยM9") {
-                    const detailColIdx = 4; const closedByColIdx = 8;
+                    const detailColIdx = 4, closedByColIdx = 8;
                     rows.forEach((row, index) => {
                         if (index < 2) return;
                         const detailValue = row.c[detailColIdx]?.v;
@@ -307,16 +271,8 @@
                     });
                 }
                 
-                return {
-                    total: totalCases,
-                    completed: completedCases,
-                    notifyCount: notifyCount,
-                    extra: extra,
-                    lastUpdate: new Date().toLocaleTimeString('th-TH'),
-                    error: false
-                };
+                return { total: totalCases, completed: completedCases, notifyCount: notifyCount, extra: extra, lastUpdate: new Date().toLocaleTimeString('th-TH'), error: false };
             } catch (err) {
-                console.error(err);
                 return { total: 0, completed: 0, error: true };
             }
         }
@@ -324,27 +280,14 @@
         async function updateDashboard(isAuto = false) {
             if (isFetching) return;
             isFetching = true;
-
             const idInput = document.getElementById('sheet-input');
             const savedId = localStorage.getItem('mflow_sheet_id');
             const id = spreadsheetId || extractId(idInput.value) || savedId;
             
-            if (!id) {
-                if (!isAuto) showError("ระบุ Link หรือ ID แผ่นงานเพื่อเริ่มต้นดึงข้อมูล");
-                isFetching = false;
-                return;
-            }
+            if (!id) { isFetching = false; return; }
 
-            hideError();
             const refreshIcon = document.getElementById('refresh-icon');
             if (refreshIcon) refreshIcon.classList.add('animate-spin');
-
-            if (!isAuto) {
-                const btn = document.getElementById('refresh-btn');
-                btn.disabled = true;
-                btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> SYNCING...';
-                initLucide();
-            }
 
             spreadsheetId = id;
             localStorage.setItem('mflow_sheet_id', id);
@@ -354,7 +297,6 @@
             document.getElementById('action-btns').classList.remove('hidden');
 
             const results = {};
-
             for (const name of targetSheets) {
                 const data = await fetchSheetData(id, name);
                 notifications[name] = (name === "L") ? (data.notifyCount > 0) : (data.total > data.completed);
@@ -365,10 +307,7 @@
             dashboardData = results;
             renderCards();
             
-            document.getElementById('last-refresh-text').innerText = `ซิงค์ข้อมูลแล้ว · ${new Date().toLocaleTimeString('th-TH')}`;
-            const mainRefreshBtn = document.getElementById('refresh-btn');
-            mainRefreshBtn.disabled = false;
-            mainRefreshBtn.innerHTML = '<i data-lucide="zap" class="w-4 h-4 fill-current"></i> CONNECT';
+            document.getElementById('last-refresh-text').innerText = `อัปเดตแล้ว · ${new Date().toLocaleTimeString('th-TH')}`;
             if (refreshIcon) refreshIcon.classList.remove('animate-spin');
             
             initLucide();
@@ -386,7 +325,7 @@
                 const percent = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
                 
                 const card = document.createElement('div');
-                card.className = `group relative glass-card rounded-2xl border transition-all duration-500 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5 hover:border-indigo-500/30'}`;
+                card.className = `group relative glass-card rounded-xl border transition-all duration-500 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5 hover:border-indigo-500/30'}`;
                 
                 let footerContent = '';
                 if (name !== "L" && data.extra > 0) {
@@ -394,46 +333,43 @@
                 }
 
                 card.innerHTML = `
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="space-y-1">
-                                <p class="text-[9px] font-black uppercase tracking-[0.2em] ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">ส่วนของข้อมูล</p>
-                                <h3 class="text-sm font-black text-white truncate max-w-[120px]">${name}</h3>
+                    <div class="p-3.5">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="space-y-0.5">
+                                <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] ${isNotified ? 'text-orange-400/90' : 'text-indigo-400/90'}">LOG</p>
+                                <h3 class="text-xs font-black text-white truncate max-w-[100px]">${name}</h3>
                             </div>
-                            <div class="p-2 rounded-xl ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/80 text-slate-500'} transition-colors">
-                                <i data-lucide="${isNotified ? 'bell' : 'shield-check'}" class="w-4 h-4 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
+                            <div class="p-1.5 rounded-lg ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/80 text-slate-500'} transition-colors">
+                                <i data-lucide="${isNotified ? 'bell' : 'shield-check'}" class="w-3.5 h-3.5 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
                             </div>
                         </div>
 
                         ${data.error ? 
-                            `<div class="py-8 text-center text-slate-600 text-xs font-bold italic tracking-wider">OFFLINE</div>` : 
-                            `<div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-2.5">
-                                    <div class="p-2.5 rounded-xl bg-slate-900/50 border border-white/5 group-hover:bg-slate-900/80 transition-colors">
-                                        <p class="text-[11px] font-extrabold text-slate-400 uppercase mb-1">จำนวนเคสทั้งหมด</p>
-                                        <p class="text-xl font-black text-white leading-none">${data.total}</p>
+                            `<div class="py-6 text-center text-slate-600 text-xs font-bold italic">OFFLINE</div>` : 
+                            `<div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="p-2 rounded-lg bg-slate-900/50 border border-white/5 transition-colors">
+                                        <p class="text-[9px] font-extrabold text-slate-400 uppercase mb-0.5">จำนวนทั้งหมด</p>
+                                        <p class="text-lg font-black text-white leading-none">${data.total}</p>
                                     </div>
-                                    <div class="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-right">
-                                        <p class="text-[11px] font-extrabold text-emerald-600/70 uppercase mb-1">จำนวนเคสที่เสร็จสิ้น</p>
-                                        <p class="text-xl font-black text-emerald-400 leading-none">${data.completed}</p>
+                                    <div class="p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-right">
+                                        <p class="text-[9px] font-extrabold text-emerald-600/70 uppercase mb-0.5">เสร็จสิ้น</p>
+                                        <p class="text-lg font-black text-emerald-400 leading-none">${data.completed}</p>
                                     </div>
                                 </div>
 
-                                <div class="space-y-2">
+                                <div class="space-y-1.5">
                                     <div class="flex justify-between items-end">
-                                        <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">เปอร์เซ็นที่สำเร็จ</span>
-                                        <span class="text-sm font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">${percent}%</span>
+                                        <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wide">ความสำเร็จ</span>
+                                        <span class="text-xs font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">${percent}%</span>
                                     </div>
-                                    <div class="h-3 progress-container rounded-full overflow-hidden p-[2px]">
-                                        <div 
-                                            class="h-full rounded-full progress-bar-smart ${isNotified ? 'bg-gradient-to-r from-orange-600 to-amber-500 text-orange-400' : 'bg-gradient-to-r from-indigo-700 to-indigo-400 text-indigo-400'}" 
-                                            style="width: ${percent}%">
-                                        </div>
+                                    <div class="h-2.5 progress-container rounded-full overflow-hidden p-[1.5px]">
+                                        <div class="h-full rounded-full progress-bar-smart ${isNotified ? 'bg-gradient-to-r from-orange-600 to-amber-500' : 'bg-gradient-to-r from-indigo-700 to-indigo-400'}" style="width: ${percent}%"></div>
                                     </div>
                                 </div>
 
-                                <div class="pt-3 border-t border-white/5 flex items-center justify-between">
-                                   <div class="flex items-center gap-1.5 text-[8px] text-slate-600 font-black">
+                                <div class="pt-2 border-t border-white/5 flex items-center justify-between">
+                                   <div class="flex items-center gap-1 text-[8px] text-slate-600 font-black">
                                      <i data-lucide="clock" class="w-2.5 h-2.5"></i> ${data.lastUpdate}
                                    </div>
                                    ${footerContent}
@@ -457,49 +393,30 @@
             }, 1000);
         }
 
-        function showError(msg) {
-            const box = document.getElementById('error-box');
-            document.getElementById('error-msg').innerText = msg;
-            box.classList.remove('hidden');
-            setTimeout(hideError, 5000);
-        }
-
-        function hideError() {
-            document.getElementById('error-box').classList.add('hidden');
-        }
-
         document.getElementById('refresh-btn').addEventListener('click', () => updateDashboard(false));
         document.getElementById('instant-refresh-btn').addEventListener('click', () => updateDashboard(false));
-        
         document.getElementById('edit-btn').addEventListener('click', () => {
             document.getElementById('sheet-input').classList.remove('hidden');
             document.getElementById('refresh-btn').classList.remove('hidden');
             document.getElementById('action-btns').classList.add('hidden');
             if (timer) clearInterval(timer);
         });
-
         document.getElementById('reset-btn').addEventListener('click', () => {
-            spreadsheetId = '';
-            localStorage.removeItem('mflow_sheet_id');
-            dashboardData = {};
-            notifications = {};
+            spreadsheetId = ''; localStorage.removeItem('mflow_sheet_id');
+            dashboardData = {}; notifications = {};
             if (timer) clearInterval(timer);
             document.getElementById('sheet-input').value = '';
             document.getElementById('sheet-input').classList.remove('hidden');
             document.getElementById('refresh-btn').classList.remove('hidden');
             document.getElementById('action-btns').classList.add('hidden');
             document.getElementById('dashboard-grid').innerHTML = '';
-            document.getElementById('last-refresh-text').innerText = 'SYSTEM READY · STANDBY';
             initLucide();
         });
 
         window.onload = () => { 
             initLucide(); 
             const savedId = localStorage.getItem('mflow_sheet_id');
-            if (savedId) {
-                spreadsheetId = savedId;
-                updateDashboard(true);
-            }
+            if (savedId) { spreadsheetId = savedId; updateDashboard(true); }
         };
     </script>
 </body>
