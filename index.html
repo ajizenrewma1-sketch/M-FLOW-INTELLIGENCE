@@ -11,7 +11,7 @@
         
         body {
             font-family: 'Sarabun', sans-serif;
-            background-color: #0f172a;
+            background-color: #020617;
             color: #e2e8f0;
             overflow-x: hidden;
         }
@@ -20,15 +20,78 @@
         ::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.2); border-radius: 10px; }
 
         .glass-card {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
         .notification-border {
-            border-color: rgba(249, 115, 22, 0.5);
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
-            background: rgba(249, 115, 22, 0.05);
+            border-color: rgba(249, 115, 22, 0.6);
+            box-shadow: 0 0 25px rgba(249, 115, 22, 0.2);
+            background: rgba(249, 115, 22, 0.08);
+        }
+
+        /* Animation หลักของแถบพลังงาน */
+        @keyframes progress-scan {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(200%); opacity: 0; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 2px currentColor); }
+            50% { filter: brightness(1.3) drop-shadow(0 0 8px currentColor); }
+        }
+
+        .progress-container {
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .progress-bar-smart {
+            position: relative;
+            overflow: hidden;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        /* แสงวิ่งผ่าน (Cyber Shimmer) */
+        .progress-bar-smart::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            animation: progress-scan 2s infinite ease-in-out;
+        }
+
+        /* เอฟเฟกต์ลายทาง (Stripes) */
+        .progress-bar-smart::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.1) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.1) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 1rem 1rem;
         }
 
         @keyframes bounce-slow {
@@ -40,29 +103,32 @@
         }
     </style>
 </head>
-<body class="min-h-screen p-2">
+<body class="min-h-screen p-3">
     <!-- Background Decor -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 left-0 w-[30%] h-[30%] bg-indigo-500/5 blur-[80px] rounded-full"></div>
-        <div class="absolute bottom-0 right-0 w-[20%] h-[20%] bg-emerald-500/5 blur-[80px] rounded-full"></div>
+        <div class="absolute top-0 left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-emerald-600/10 blur-[120px] rounded-full"></div>
     </div>
 
     <div id="app" class="relative z-10 max-w-full mx-auto">
         <!-- Header -->
-        <header class="mb-3">
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/40 backdrop-blur-xl p-3 rounded-xl border border-white/5 shadow-2xl">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-indigo-600 rounded-lg shadow-lg">
-                        <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+        <header class="mb-4">
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900/60 backdrop-blur-2xl p-4 rounded-2xl border border-white/10 shadow-2xl">
+                <div class="flex items-center gap-4">
+                    <div class="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-lg shadow-indigo-500/20">
+                        <i data-lucide="activity" class="w-6 h-6 text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg font-black bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight leading-none uppercase">
+                        <h1 class="text-xl font-black bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tighter leading-none uppercase">
                             M-FLOW INTELLIGENCE
                         </h1>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                                <i data-lucide="timer" class="w-2.5 h-2.5"></i>
-                                อัตโนมัติ: <span id="countdown">30</span> วินาที
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                <span class="relative flex h-2 w-2">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                รีเฟรชอัตโนมัติ: <span id="countdown">30</span> วิ
                             </span>
                         </div>
                     </div>
@@ -72,64 +138,58 @@
                     <input 
                         type="text" 
                         id="sheet-input"
-                        placeholder="ระบุ ID แผ่นงาน..."
-                        class="bg-slate-800/50 border border-slate-700/50 rounded-lg py-1.5 px-3 text-xs focus:outline-none w-48 transition-all placeholder:text-slate-600"
+                        placeholder="วาง Link Google Sheets ที่นี่..."
+                        class="bg-slate-800/80 border border-slate-700 rounded-xl py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-64 transition-all placeholder:text-slate-500"
                     >
                     <button 
                         id="refresh-btn"
-                        class="bg-white text-slate-900 px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-indigo-50 active:scale-95 flex items-center gap-2"
+                        class="bg-white text-slate-900 px-5 py-2 rounded-xl text-sm font-black transition-all hover:bg-indigo-50 active:scale-95 flex items-center gap-2 shadow-lg"
                     >
-                        <i data-lucide="zap" class="w-3 h-3 fill-current"></i>
-                        ดึงข้อมูล
+                        <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
+                        CONNECT
                     </button>
                     <div id="action-btns" class="hidden flex items-center gap-2">
                         <button 
                             id="instant-refresh-btn"
-                            title="รีเฟรชข้อมูลทันที"
-                            class="bg-indigo-600 hover:bg-indigo-500 text-white p-1.5 rounded-lg transition-all flex items-center gap-2 px-3 text-[10px] font-bold"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-xl transition-all flex items-center gap-2 px-4 text-xs font-bold"
                         >
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
-                            รีเฟรชทันที
+                            <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
+                            รีเฟรชข้อมูล
                         </button>
-                        <button 
-                            id="edit-btn"
-                            title="แก้ไข URL"
-                            class="bg-slate-800 hover:bg-slate-700 text-slate-400 p-1.5 rounded-lg transition-all"
-                        >
-                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        <button id="edit-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl transition-all border border-white/5">
+                            <i data-lucide="settings-2" class="w-5 h-5"></i>
                         </button>
-                        <button 
-                            id="reset-btn"
-                            title="ล้างข้อมูลทั้งหมด"
-                            class="bg-slate-800 hover:bg-red-900/40 text-slate-400 hover:text-red-400 p-1.5 rounded-lg transition-all"
-                        >
-                            <i data-lucide="layers" class="w-4 h-4"></i>
+                        <button id="reset-btn" class="bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 p-2 rounded-xl transition-all border border-white/5">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div id="error-box" class="hidden mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-400 text-[10px] font-bold">
-            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+        <div id="error-box" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-xs font-bold animate-pulse">
+            <i data-lucide="alert-octagon" class="w-5 h-5"></i>
             <p id="error-msg"></p>
         </div>
 
         <main>
-            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2">
+            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                 <!-- Cards will be injected here -->
             </div>
         </main>
 
-        <footer class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+        <footer class="mt-6 pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-slate-600"></i>
-                <p id="last-refresh-text" class="text-[9px] text-indigo-400 font-bold uppercase tracking-widest">
-                    รอดำเนินการดึงข้อมูล...
+                <div class="flex -space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-600 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold">M</div>
+                    <div class="w-6 h-6 rounded-full bg-emerald-600 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold">F</div>
+                </div>
+                <p id="last-refresh-text" class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    SYSTEM READY · STANDBY
                 </p>
             </div>
-            <div class="text-[8px] font-bold text-slate-600 uppercase tracking-widest">
-                M-FLOW SYSTEM READY
+            <div class="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em]">
+                Secure Intelligence Protocol v2.5
             </div>
         </footer>
     </div>
@@ -196,59 +256,35 @@
                     });
                 }
                 else if (sheetName === "L") {
-                    const reporterColIdx = 3; // D
-                    const detailEColIdx = 4;  // E
-                    const regColIdx = 5;      // F
-                    const infoHColIdx = 7;    // H (ข้อมูลเพิ่มเติม)
-                    const openerColIdx = 13;  // N
+                    const reporterColIdx = 3; const detailEColIdx = 4; const regColIdx = 5;
+                    const infoHColIdx = 7; const openerColIdx = 13;
                     
                     rows.forEach((row, index) => {
                         if (index < 3) return; 
-                        
                         const regValue = row.c[regColIdx]?.v;
                         if (isNotEmpty(regValue)) {
                             totalCases++;
-                            
                             const reporter = String(row.c[reporterColIdx]?.v || "").toUpperCase();
                             const detailE = String(row.c[detailEColIdx]?.v || "").toUpperCase();
                             const infoH = String(row.c[infoHColIdx]?.v || "");
-                            
                             const isQC = reporter.includes("QC");
-                            
                             let isSilentCase = false;
-
                             if (isQC) {
-                                // กรณีเป็น R6
                                 if (detailE.startsWith("R6")) {
-                                    // ตรวจสอบ H ว่าลงท้ายด้วย (แก้ไขได้) หรือไม่
-                                    const canEdit = infoH.trim().endsWith("(แก้ไขได้)");
-                                    if (canEdit) {
-                                        // กรณี (แก้ไขได้): นับเป็นเคสใหม่ และแจ้งเตือนปกติ (isSilentCase = false)
-                                        isSilentCase = false;
-                                    } else {
-                                        // กรณีไม่มี (แก้ไขได้): นับเป็นเคสใหม่ แต่ไม่แจ้งเตือน
-                                        isSilentCase = true;
-                                    }
-                                } 
-                                // กรณี R อื่นๆ (R2-R5, R7-R11)
-                                else if (/^(R2|R3|R4|R5|R7|R8|R9|R10|R11)\b/.test(detailE)) {
+                                    isSilentCase = !infoH.trim().endsWith("(แก้ไขได้)");
+                                } else if (/^(R2|R3|R4|R5|R7|R8|R9|R10|R11)\b/.test(detailE)) {
                                     isSilentCase = true;
                                 }
                             }
-                            
-                            const openerValue = row.c[openerColIdx]?.v;
-                            if (isNotEmpty(openerValue)) {
+                            if (isNotEmpty(row.c[openerColIdx]?.v)) {
                                 completedCases++;
-                            } else {
-                                // ถ้ายังไม่สำเร็จ ตรวจสอบว่าจะให้นับยอดแจ้งเตือน (กรอบส้ม) หรือไม่
-                                if (!isSilentCase) {
-                                    notifyCount++; 
-                                }
+                            } else if (!isSilentCase) {
+                                notifyCount++; 
                             }
                         }
                     });
                 }
-                else if (sheetName === "L ชำระเงินแล้ว") {
+                else if (sheetName === "L ชำระเงินแล้ว" || sheetName === "N") {
                     const detailColIdx = 5; const openerColIdx = 9; 
                     rows.forEach((row, index) => {
                         if (index < 2) return; 
@@ -256,17 +292,6 @@
                         if (isNotEmpty(detailValue)) {
                             totalCases++;
                             if (isNotEmpty(row.c[openerColIdx]?.v)) completedCases++;
-                        }
-                    });
-                }
-                else if (sheetName === "N") {
-                    const detailColIdx = 5; const closedByColIdx = 9;
-                    rows.forEach((row, index) => {
-                        if (index < 2) return;
-                        const detailValue = row.c[detailColIdx]?.v;
-                        if (isNotEmpty(detailValue)) {
-                            totalCases++;
-                            if (isNotEmpty(row.c[closedByColIdx]?.v)) completedCases++;
                         }
                     });
                 }
@@ -305,7 +330,7 @@
             const id = spreadsheetId || extractId(idInput.value) || savedId;
             
             if (!id) {
-                if (!isAuto) showError("กรุณาระบุ Link หรือ ID ให้ถูกต้อง");
+                if (!isAuto) showError("ระบุ Link หรือ ID แผ่นงานเพื่อเริ่มต้นดึงข้อมูล");
                 isFetching = false;
                 return;
             }
@@ -317,7 +342,7 @@
             if (!isAuto) {
                 const btn = document.getElementById('refresh-btn');
                 btn.disabled = true;
-                btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> กำลังโหลด...';
+                btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> SYNCING...';
                 initLucide();
             }
 
@@ -332,27 +357,18 @@
 
             for (const name of targetSheets) {
                 const data = await fetchSheetData(id, name);
-                
-                if (name === "L") {
-                    notifications[name] = data.notifyCount > 0;
-                } else {
-                    notifications[name] = data.total > data.completed;
-                }
-
-                if (data.total === 0 || data.error) {
-                    notifications[name] = false;
-                }
-                
+                notifications[name] = (name === "L") ? (data.notifyCount > 0) : (data.total > data.completed);
+                if (data.total === 0 || data.error) notifications[name] = false;
                 results[name] = data;
             }
 
             dashboardData = results;
             renderCards();
             
-            document.getElementById('last-refresh-text').innerText = `อัปเดตล่าสุดเมื่อ: ${new Date().toLocaleTimeString('th-TH')}`;
+            document.getElementById('last-refresh-text').innerText = `ซิงค์ข้อมูลแล้ว · ${new Date().toLocaleTimeString('th-TH')}`;
             const mainRefreshBtn = document.getElementById('refresh-btn');
             mainRefreshBtn.disabled = false;
-            mainRefreshBtn.innerHTML = '<i data-lucide="zap" class="w-3 h-3 fill-current"></i> ดึงข้อมูล';
+            mainRefreshBtn.innerHTML = '<i data-lucide="zap" class="w-4 h-4 fill-current"></i> CONNECT';
             if (refreshIcon) refreshIcon.classList.remove('animate-spin');
             
             initLucide();
@@ -370,53 +386,56 @@
                 const percent = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
                 
                 const card = document.createElement('div');
-                card.className = `group relative glass-card rounded-xl border transition-all duration-300 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5'}`;
+                card.className = `group relative glass-card rounded-2xl border transition-all duration-500 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5 hover:border-indigo-500/30'}`;
                 
                 let footerContent = '';
                 if (name !== "L" && data.extra > 0) {
-                    footerContent = `<span class="text-indigo-400">ข้อมูลเพิ่ม: ${data.extra}</span>`;
+                    footerContent = `<span class="bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded text-[8px]">เพิ่มเติม: ${data.extra}</span>`;
                 }
 
                 card.innerHTML = `
-                    <div class="p-3">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="space-y-0.5">
-                                <p class="text-[8px] font-black uppercase tracking-widest ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">Log</p>
-                                <h3 class="text-xs font-bold text-white truncate max-w-[90px]">${name}</h3>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="space-y-1">
+                                <p class="text-[9px] font-black uppercase tracking-[0.2em] ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">ส่วนของข้อมูล</p>
+                                <h3 class="text-sm font-black text-white truncate max-w-[120px]">${name}</h3>
                             </div>
-                            <div class="p-1.5 rounded-lg ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/50 text-slate-500'}">
-                                <i data-lucide="${isNotified ? 'bell-ring' : 'file-spreadsheet'}" class="w-3.5 h-3.5 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
+                            <div class="p-2 rounded-xl ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/80 text-slate-500'} transition-colors">
+                                <i data-lucide="${isNotified ? 'bell' : 'shield-check'}" class="w-4 h-4 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
                             </div>
                         </div>
 
                         ${data.error ? 
-                            `<div class="py-6 text-center text-slate-600 text-[10px] font-medium italic">ไม่สามารถเชื่อมต่อได้</div>` : 
-                            `<div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div class="p-2 rounded-lg bg-slate-800/30 border border-white/5">
-                                        <p class="text-lg font-black text-white leading-none tracking-tighter">${data.total}</p>
-                                        <p class="text-[7px] font-bold text-slate-500 uppercase mt-1">จำนวนเคสทั้งหมด</p>
+                            `<div class="py-8 text-center text-slate-600 text-xs font-bold italic tracking-wider">OFFLINE</div>` : 
+                            `<div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div class="p-2.5 rounded-xl bg-slate-900/50 border border-white/5 group-hover:bg-slate-900/80 transition-colors">
+                                        <p class="text-[11px] font-extrabold text-slate-400 uppercase mb-1">จำนวนเคสทั้งหมด</p>
+                                        <p class="text-xl font-black text-white leading-none">${data.total}</p>
                                     </div>
-                                    <div class="p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-right">
-                                        <p class="text-lg font-black text-emerald-400 leading-none tracking-tighter">${data.completed}</p>
-                                        <p class="text-[7px] font-bold text-emerald-600/70 uppercase mt-1">จำนวนเคสที่เสร็จสิ้น</p>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-1">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-[8px] font-bold text-slate-500 uppercase">เปอร์เซ็นสำเร็จ</span>
-                                        <span class="text-[10px] font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">${percent}%</span>
-                                    </div>
-                                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
-                                        <div class="h-full rounded-full transition-all duration-1000 ${isNotified ? 'bg-orange-500' : 'bg-indigo-600'}" style="width: ${percent}%"></div>
+                                    <div class="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-right">
+                                        <p class="text-[11px] font-extrabold text-emerald-600/70 uppercase mb-1">จำนวนเคสที่เสร็จสิ้น</p>
+                                        <p class="text-xl font-black text-emerald-400 leading-none">${data.completed}</p>
                                     </div>
                                 </div>
 
-                                <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[8px] text-slate-600 font-bold uppercase tracking-tighter">
-                                   <span class="flex items-center gap-1">
-                                     <i data-lucide="clock" class="w-2.5 h-2.5 opacity-50"></i> ${data.lastUpdate}
-                                   </span>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-end">
+                                        <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">เปอร์เซ็นที่สำเร็จ</span>
+                                        <span class="text-sm font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">${percent}%</span>
+                                    </div>
+                                    <div class="h-3 progress-container rounded-full overflow-hidden p-[2px]">
+                                        <div 
+                                            class="h-full rounded-full progress-bar-smart ${isNotified ? 'bg-gradient-to-r from-orange-600 to-amber-500 text-orange-400' : 'bg-gradient-to-r from-indigo-700 to-indigo-400 text-indigo-400'}" 
+                                            style="width: ${percent}%">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-3 border-t border-white/5 flex items-center justify-between">
+                                   <div class="flex items-center gap-1.5 text-[8px] text-slate-600 font-black">
+                                     <i data-lucide="clock" class="w-2.5 h-2.5"></i> ${data.lastUpdate}
+                                   </div>
                                    ${footerContent}
                                 </div>
                             </div>`
@@ -434,9 +453,7 @@
                 if (isFetching) return;
                 countdown--;
                 document.getElementById('countdown').innerText = countdown;
-                if (countdown <= 0) {
-                    updateDashboard(true);
-                }
+                if (countdown <= 0) updateDashboard(true);
             }, 1000);
         }
 
@@ -444,6 +461,7 @@
             const box = document.getElementById('error-box');
             document.getElementById('error-msg').innerText = msg;
             box.classList.remove('hidden');
+            setTimeout(hideError, 5000);
         }
 
         function hideError() {
@@ -471,7 +489,7 @@
             document.getElementById('refresh-btn').classList.remove('hidden');
             document.getElementById('action-btns').classList.add('hidden');
             document.getElementById('dashboard-grid').innerHTML = '';
-            document.getElementById('last-refresh-text').innerText = 'รอดำเนินการดึงข้อมูล...';
+            document.getElementById('last-refresh-text').innerText = 'SYSTEM READY · STANDBY';
             initLucide();
         });
 
