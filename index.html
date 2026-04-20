@@ -233,7 +233,7 @@
             <div class="flex items-center gap-2">
                 <p id="last-refresh-text" class="text-[8px] text-slate-500 font-bold uppercase tracking-widest">STATUS: IDLE</p>
             </div>
-            <div class="text-[8px] font-black text-slate-700 uppercase tracking-[0.3em]">Shield v3.1.1</div>
+            <div class="text-[8px] font-black text-slate-700 uppercase tracking-[0.3em]">Shield v3.1.2</div>
         </footer>
     </div>
 
@@ -477,7 +477,7 @@
                     <div class="p-2">
                         <div class="flex justify-between items-start mb-2">
                             <div class="space-y-0">
-                                <p class="text-[8px] font-extrabold uppercase tracking-widest ${isNotified ? 'text-orange-400/90' : 'text-indigo-400/90'}">SOURCE</p>
+                                <p class="text-[8px] font-extrabold uppercase tracking-widest ${isNotified ? 'text-orange-400/90' : 'text-indigo-400/90'}">ชีท</p>
                                 <h3 class="text-[11px] font-black text-white truncate max-w-[100px] uppercase italic leading-none">${name}</h3>
                             </div>
                             <div class="p-1 rounded-lg ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/80 text-slate-500'} shadow-sm">
@@ -486,11 +486,11 @@
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 mb-2">
                             <div class="p-1.5 rounded-lg bg-slate-950/40 border border-white/5">
-                                <p class="text-[8px] font-extrabold text-slate-500 uppercase mb-0.5 leading-none">TOTAL</p>
+                                <p class="text-[8px] font-extrabold text-slate-500 uppercase mb-0.5 leading-none">เคสทั้งหมด</p>
                                 <p class="text-base font-black text-white leading-none tracking-tight">${data.total}</p>
                             </div>
                             <div class="p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-right">
-                                <p class="text-[8px] font-extrabold text-emerald-600/70 uppercase mb-0.5 leading-none">DONE</p>
+                                <p class="text-[8px] font-extrabold text-emerald-600/70 uppercase mb-0.5 leading-none">เคสสำเร็จ</p>
                                 <p class="text-base font-black text-emerald-400 leading-none tracking-tight">${data.completed}</p>
                             </div>
                         </div>
@@ -499,7 +499,7 @@
                                 <span class="text-[8px] font-extrabold text-slate-500 uppercase tracking-widest leading-none">SUCCESS</span>
                                 <span class="text-[10px] font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'} italic tracking-tighter leading-none">${percent}%</span>
                             </div>
-                            <div class="h-2 progress-container rounded-full">
+                            <div class="h-2.5 progress-container rounded-full">
                                 <div class="h-full rounded-full progress-bar-premium bg-gradient-to-r ${isNotified ? 'from-orange-600 to-amber-400 glow-orange' : 'from-indigo-600 to-blue-500 glow-indigo'}" style="width: ${percent}%">
                                     <div class="glossy-top"></div>
                                 </div>
