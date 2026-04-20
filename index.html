@@ -367,8 +367,15 @@
 
             alprContainer.classList.toggle('hidden', !alpr);
             alertSummaryCard.classList.toggle('alert-glow', alpr);
-            alertStatusText.innerText = alpr ? 'ALPR ACTION' : 'SYSTEM OK';
-            alertStatusText.className = `text-[9px] font-bold mt-0.5 uppercase ${alpr ? 'text-orange-500' : 'text-slate-500'}`;
+            
+            // อัปเดตข้อความตามเงื่อนไขที่ผู้ใช้ต้องการ
+            if (alpr) {
+                alertStatusText.innerText = 'ALPR ACTION';
+                alertStatusText.className = 'text-[9px] font-bold mt-0.5 uppercase text-orange-500';
+            } else {
+                alertStatusText.innerText = 'AL ไม่มีเคสใหม่';
+                alertStatusText.className = 'text-[9px] font-bold mt-0.5 uppercase text-slate-500';
+            }
         }
 
         function renderDashboard(data) {
