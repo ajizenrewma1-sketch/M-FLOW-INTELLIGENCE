@@ -32,66 +32,102 @@
             background: rgba(249, 115, 22, 0.08);
         }
 
-        /* Summary Widget Styles */
         .summary-circle-path {
             transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes progress-scan {
-            0% { transform: translateX(-100%); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateX(200%); opacity: 0; }
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { filter: brightness(1) drop-shadow(0 0 2px currentColor); }
-            50% { filter: brightness(1.3) drop-shadow(0 0 8px currentColor); }
-        }
-
-        .progress-container {
-            background: rgba(30, 41, 59, 0.8);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .progress-bar-smart {
-            position: relative;
-            overflow: hidden;
-            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: pulse-glow 3s infinite ease-in-out;
-        }
-
-        .progress-bar-smart::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: progress-scan 2s infinite ease-in-out;
-        }
-
-        .progress-bar-smart::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
-            background-size: 1rem 1rem;
+        @keyframes shine-sweep {
+            0% { transform: translateX(-200%); }
+            100% { transform: translateX(200%); }
         }
 
         @keyframes bounce-slow {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-2px); }
         }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .progress-container {
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .progress-bar-premium {
+            position: relative;
+            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: inherit;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar-premium::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.06) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.06) 50%,
+                rgba(255, 255, 255, 0.06) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 30px 30px;
+            z-index: 1;
+        }
+
+        .progress-bar-premium::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255, 255, 255, 0.15),
+                transparent
+            );
+            animation: shine-sweep 4s infinite linear;
+            z-index: 2;
+        }
+
+        .glossy-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+            z-index: 3;
+            border-radius: inherit;
+        }
+
+        .glow-indigo { box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+        .glow-orange { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+
         .animate-bounce-slow {
             animation: bounce-slow 2s infinite;
         }
+        
+        .animate-pulse-soft {
+            animation: pulse-soft 2s infinite;
+        }
     </style>
 </head>
-<body class="min-h-screen p-2.5">
+<body class="min-h-screen p-3">
     <!-- Background Decor -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-0 left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
@@ -99,98 +135,95 @@
     </div>
 
     <div id="app" class="relative z-10 max-w-full mx-auto">
-        <header class="mb-3 space-y-2">
-            <!-- Top Navigation Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 backdrop-blur-2xl p-2.5 rounded-xl border border-white/10 shadow-2xl">
+        <header class="mb-3 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900/60 backdrop-blur-2xl p-2.5 rounded-xl border border-white/10 shadow-2xl">
                 <div class="flex items-center gap-3">
                     <div class="p-1.5 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow-lg">
                         <i data-lucide="activity" class="w-4 h-4 text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-base font-black bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tighter leading-none uppercase">
+                        <h1 class="text-base font-black bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tighter uppercase italic">
                             M-FLOW INTELLIGENCE
                         </h1>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="flex items-center gap-1.5 text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
-                                <span class="relative flex h-1 w-1">
+                                <span class="relative flex h-1.5 w-1.5">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-1 w-1 bg-emerald-500"></span>
                                 </span>
-                                รีเฟรช: <span id="countdown">30</span> วินาที
+                                รีเฟรชอัตโนมัติ: <span id="countdown" class="font-black">30</span> วินาที
                             </span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-2" id="input-area">
-                    <input 
-                        type="text" 
-                        id="sheet-input"
-                        placeholder="วาง Link Google Sheets..."
-                        class="bg-slate-800/80 border border-slate-700 rounded-lg py-1 px-3 text-[10px] focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-48 transition-all placeholder:text-slate-500"
-                    >
-                    <button 
-                        id="refresh-btn"
-                        class="bg-white text-slate-900 px-3 py-1 rounded-lg text-[10px] font-black transition-all hover:bg-indigo-50 active:scale-95 flex items-center gap-2 shadow-lg"
-                    >
-                        <i data-lucide="zap" class="w-3 h-3 fill-current"></i>
+                <div class="flex flex-col sm:flex-row items-center gap-2" id="input-area">
+                    <div id="config-inputs" class="flex flex-col gap-1.5">
+                        <input type="text" id="sheet-input-main" placeholder="URL Google Sheets (หลัก)" class="bg-slate-800/80 border border-slate-700 rounded-lg py-1.5 px-3 text-[10px] focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-64 transition-all placeholder:text-slate-500">
+                        <input type="text" id="sheet-input-manual" placeholder="URL Google Sheets (Log Manual)" class="bg-slate-800/80 border border-slate-700 rounded-lg py-1.5 px-3 text-[10px] focus:outline-none focus:ring-1 focus:ring-indigo-500/50 w-64 transition-all placeholder:text-slate-500">
+                    </div>
+                    <button id="refresh-btn" class="bg-white text-slate-900 px-3 py-2 rounded-lg text-[10px] font-black hover:bg-indigo-50 flex items-center gap-2 shadow-lg">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i>
                         CONNECT
                     </button>
                     <div id="action-btns" class="hidden flex items-center gap-1.5">
-                        <button 
-                            id="instant-refresh-btn"
-                            class="bg-indigo-600 hover:bg-indigo-500 text-white p-1 rounded-lg transition-all flex items-center gap-1.5 px-2.5 text-[9px] font-bold"
-                        >
-                            <i data-lucide="refresh-cw" class="w-3 h-3" id="refresh-icon"></i>
-                            รีเฟรชข้อมูล
+                        <button id="instant-refresh-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg transition-all flex items-center gap-2 px-3 text-[10px] font-bold">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
+                            รีเฟรช
                         </button>
-                        <button id="edit-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-1 rounded-lg border border-white/5">
+                        <button id="edit-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg border border-white/5 transition-colors">
                             <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
                         </button>
-                        <button id="reset-btn" class="bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 p-1 rounded-lg border border-white/5">
+                        <button id="reset-btn" class="bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 p-2 rounded-lg border border-white/5 transition-colors">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Compact Total Summary Widget -->
             <div id="summary-widget" class="hidden glass-card rounded-xl border border-white/10 p-3 shadow-2xl flex flex-col sm:flex-row items-center gap-4 overflow-hidden">
-                <div class="flex items-center gap-3 border-b sm:border-b-0 sm:border-r border-white/5 pb-3 sm:pb-0 sm:pr-4">
-                    <div class="relative w-16 h-16">
-                        <svg viewBox="0 0 36 36" class="w-full h-full">
-                            <path class="text-slate-800" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path id="summary-circle-progress" class="summary-circle-path text-indigo-500" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <div class="flex items-center gap-4 border-b sm:border-b-0 sm:border-r border-white/10 pb-3 sm:pb-0 sm:pr-4">
+                    <div class="relative w-14 h-14">
+                        <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90">
+                            <circle cx="18" cy="18" r="15.9155" fill="none" class="text-slate-800" stroke-width="3" stroke="currentColor" />
+                            <path id="summary-circle-progress" class="summary-circle-path text-indigo-500" stroke-width="3" stroke-dasharray="0, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="summary-total-percent" class="text-sm font-black text-white leading-none">0%</span>
+                            <span id="summary-total-percent" class="text-xs font-black text-white leading-none">0%</span>
                         </div>
                     </div>
                     <div class="min-w-fit">
-                        <h2 class="text-[11px] font-black text-white uppercase italic tracking-tighter leading-none mb-0.5">สรุปภาพรวม</h2>
-                        <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-none">TOTAL PERFORMANCE</p>
+                        <h2 class="text-[10px] font-black text-white uppercase italic tracking-tight">สรุปภาพรวม</h2>
+                        <div id="alpr-alert-container" class="flex items-center gap-1.5 hidden">
+                           <span class="flex h-1.5 w-1.5">
+                                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-500"></span>
+                           </span>
+                           <span class="text-[10px] font-black text-orange-400 uppercase italic animate-pulse-soft">มีเคสใหม่ ALPR</span>
+                        </div>
+                        <p id="performance-label" class="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-none">Performance</p>
                     </div>
                 </div>
 
                 <div class="flex-1 grid grid-cols-3 gap-2 w-full">
-                    <div class="flex flex-col justify-center px-2">
+                    <div class="flex flex-col justify-center px-3">
                         <div class="flex items-center gap-1 mb-0.5 text-slate-500">
                             <i data-lucide="layers" class="w-2.5 h-2.5"></i>
                             <span class="text-[8px] font-black uppercase tracking-widest">ทั้งหมด</span>
                         </div>
                         <p id="summary-total-cases" class="text-xl font-black text-white tracking-tighter leading-none">0</p>
                     </div>
-                    <div class="flex flex-col justify-center border-l border-white/5 px-2">
+                    <div class="flex flex-col justify-center border-l border-white/5 px-3">
                         <div class="flex items-center gap-1 mb-0.5 text-emerald-500">
                             <i data-lucide="check-circle" class="w-2.5 h-2.5"></i>
-                            <span class="text-[8px] font-black uppercase tracking-widest">สำเร็จ</span>
+                            <span class="text-[8px] font-black uppercase tracking-widest">เสร็จ</span>
                         </div>
                         <p id="summary-total-done" class="text-xl font-black text-emerald-400 tracking-tighter leading-none">0</p>
                     </div>
-                    <div class="flex flex-col justify-center border-l border-white/5 px-2">
+                    <div class="flex flex-col justify-center border-l border-white/5 px-3">
                         <div class="flex items-center gap-1 mb-0.5 text-indigo-400">
                             <i data-lucide="trending-up" class="w-2.5 h-2.5"></i>
-                            <span class="text-[8px] font-black uppercase tracking-widest">ความสำเร็จ</span>
+                            <span class="text-[8px] font-black uppercase tracking-widest">อัตรา</span>
                         </div>
                         <p id="summary-total-percent-text" class="text-xl font-black text-indigo-400 tracking-tighter leading-none">0%</p>
                     </div>
@@ -199,78 +232,100 @@
         </header>
 
         <main>
-            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5">
-                <!-- Cards will be injected here -->
-            </div>
+            <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5"></div>
         </main>
 
         <footer class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <p id="last-refresh-text" class="text-[8px] text-slate-500 font-bold uppercase tracking-wider">
-                    SYSTEM STANDBY
-                </p>
+                <p id="last-refresh-text" class="text-[8px] text-slate-500 font-bold uppercase tracking-widest">STATUS: IDLE</p>
             </div>
-            <div class="text-[8px] font-black text-slate-700 uppercase tracking-[0.2em]">
-                Secure Protocol v2.5
-            </div>
+            <div class="text-[8px] font-black text-slate-700 uppercase tracking-[0.3em]">Shield v3.1.0</div>
         </footer>
     </div>
 
     <script>
-        let spreadsheetId = '';
+        let mainSpreadsheetId = '';
+        let manualSpreadsheetId = '';
         let countdown = 30;
         let timer = null;
         let dashboardData = {};
         let notifications = {};
         let isFetching = false;
-        const targetSheets = ["AL อนุมัติผิด", "C", "L", "N", "L ชำระเงินแล้ว", "พินัยM9"];
+
+        // "AL อนุมัติผิด" จะถูกย้ายไป hiddenMainSheets เพื่อให้ทำงานอยู่เบื้องหลัง
+        const visibleMainSheets = ["C", "L", "N", "L ชำระเงินแล้ว", "พินัยM9"];
+        const hiddenMainSheets = ["AL อนุมัติผิด"]; 
+        const manualSheetName = "Transaction Manual";
 
         function initLucide() { lucide.createIcons(); }
+        
         function extractId(url) {
+            if (!url) return '';
             const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
             return matches ? matches[1] : url;
         }
+
         function isNotEmpty(value) {
             return value !== null && value !== undefined && String(value).trim().length > 0;
         }
 
-        async function fetchSheetData(id, sheetName) {
+        async function fetchManualData(id) {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(manualSheetName)}`;
+                const response = await fetch(url);
+                const text = await response.text();
+                const jsonData = JSON.parse(text.substring(47, text.length - 2));
+                const rows = jsonData.table.rows;
+                
+                let totalCases = 0, completedCases = 0, hasNewAlert = false;
+                let alertRows = [];
+                const targetTypes = ["ตรวจสอบรายการผ่านทาง", "ตรวจสอบการผ่านทางที่ได้รับการยกเว้น", "ตรวจสอบรายการผ่านทางอนุมัติผ่านทางพิเศษ"];
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || !row.c) continue;
+                    const colH = row.c[7]?.v;
+                    const colI = String(row.c[8]?.v || "").trim();
+                    const colL = String(row.c[11]?.v || "").trim();
+                    const colR = row.c[17]?.v;
+                    if (!isNotEmpty(colH)) continue;
+                    if (colI.startsWith("เตรียมข้อมูล")) continue;
+                    totalCases++;
+                    const isTargetType = targetTypes.some(type => colI.includes(type));
+                    let isDone = isNotEmpty(colR) || colL === "สร้างTXNเท่านั้น" || colL === "-" || (isTargetType && colL === "แก้ไขจาก RCF");
+                    if (isDone) completedCases++;
+                    if (!colI.includes("ตรวจสอบการผ่านทางที่ผิดกฎหมาย") && !isDone && isTargetType) {
+                        hasNewAlert = true;
+                        alertRows.push(i + 1);
+                    }
+                }
+                return { total: totalCases, completed: completedCases, notify: hasNewAlert, alertRows: alertRows, error: false };
+            } catch (err) {
+                return { total: 0, completed: 0, notify: false, error: true };
+            }
+        }
+
+        async function fetchMainSheetData(id, sheetName) {
             try {
                 const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
                 const response = await fetch(url);
                 const text = await response.text();
                 const jsonData = JSON.parse(text.substring(47, text.length - 2));
                 const rows = jsonData.table.rows;
-                const cols = jsonData.table.cols;
-
                 let totalCases = 0, completedCases = 0, notifyCount = 0, extra = 0;
 
                 if (sheetName === "AL อนุมัติผิด") {
-                    const alprColIndex = cols.findIndex(c => c.label && c.label.includes("ทะเบียนที่ ALPR อนุมัติผิด"));
-                    const targetIdx = alprColIndex !== -1 ? alprColIndex : 1; 
-                    const inspectorColIdx = 13; 
-                    rows.forEach(row => {
-                        const cellValue = row.c[targetIdx]?.v;
-                        if (isNotEmpty(cellValue)) {
+                    rows.forEach((row) => {
+                        if (row.c && isNotEmpty(row.c[3]?.v)) {
                             totalCases++;
-                            if (isNotEmpty(row.c[inspectorColIdx]?.v)) completedCases++;
+                            if (isNotEmpty(row.c[13]?.v)) {
+                                completedCases++;
+                            } else {
+                                notifyCount++; 
+                            }
                         }
                     });
-                } 
-                else if (sheetName === "C") {
-                    const detailColIdx = 5; const opColIdx = 9;
-                    rows.forEach((row, index) => {
-                        if (index < 2) return;
-                        const detailValue = row.c[detailColIdx]?.v;
-                        if (isNotEmpty(detailValue)) {
-                            totalCases++;
-                            if (isNotEmpty(row.c[opColIdx]?.v)) completedCases++;
-                            const rowText = row.c.map(cell => String(cell?.v || "").toLowerCase()).join(" ");
-                            if (rowText.includes("ข้อมูลเพิ่ม") || rowText.includes("ม่วง")) extra++;
-                        }
-                    });
-                }
-                else if (sheetName === "L") {
+                } else if (sheetName === "L") {
                     const reporterColIdx = 3, detailEColIdx = 4, regColIdx = 5, infoHColIdx = 7, openerColIdx = 13;
                     rows.forEach((row, index) => {
                         if (index < 3) return; 
@@ -280,169 +335,189 @@
                             const reporter = String(row.c[reporterColIdx]?.v || "").toUpperCase();
                             const detailE = String(row.c[detailEColIdx]?.v || "").toUpperCase();
                             const infoH = String(row.c[infoHColIdx]?.v || "");
-                            const isQC = reporter.includes("QC");
-                            let isSilentCase = false;
-                            if (isQC) {
-                                if (detailE.startsWith("R6")) {
-                                    isSilentCase = !infoH.trim().endsWith("(แก้ไขได้)");
-                                } else if (/^(R2|R3|R4|R5|R7|R8|R9|R10|R11)\b/.test(detailE)) {
-                                    isSilentCase = true;
+                            const isDone = isNotEmpty(row.c[openerColIdx]?.v);
+                            
+                            if (isDone) {
+                                completedCases++;
+                            } else {
+                                if (reporter === "QC" && detailE.startsWith("R6")) {
+                                    if (infoH.includes("แก้ไข")) {
+                                        notifyCount++;
+                                    }
+                                } else {
+                                    notifyCount++;
                                 }
                             }
-                            if (isNotEmpty(row.c[openerColIdx]?.v)) {
-                                completedCases++;
-                            } else if (!isSilentCase) {
-                                notifyCount++; 
+                        }
+                    });
+                } else if (sheetName === "C" || sheetName === "L ชำระเงินแล้ว" || sheetName === "N") {
+                    const detailIdx = 5, opIdx = 9;
+                    rows.forEach((row, index) => {
+                        if (index < 2) return;
+                        if (isNotEmpty(row.c[detailIdx]?.v)) {
+                            totalCases++;
+                            if (isNotEmpty(row.c[opIdx]?.v)) completedCases++;
+                            else notifyCount++; 
+                            if (sheetName === "C") {
+                                const txt = row.c.map(c => String(c?.v || "").toLowerCase()).join(" ");
+                                if (txt.includes("ข้อมูลเพิ่ม") || txt.includes("ม่วง")) extra++;
                             }
                         }
                     });
-                }
-                else if (sheetName === "L ชำระเงินแล้ว" || sheetName === "N") {
-                    const detailColIdx = 5, openerColIdx = 9; 
-                    rows.forEach((row, index) => {
-                        if (index < 2) return; 
-                        const detailValue = row.c[detailColIdx]?.v;
-                        if (isNotEmpty(detailValue)) {
-                            totalCases++;
-                            if (isNotEmpty(row.c[openerColIdx]?.v)) completedCases++;
-                        }
-                    });
-                }
-                else if (sheetName === "พินัยM9") {
-                    const detailColIdx = 4, closedByColIdx = 8;
+                } else if (sheetName === "พินัยM9") {
+                    const detailIdx = 4, closedIdx = 8;
                     rows.forEach((row, index) => {
                         if (index < 2) return;
-                        const detailValue = row.c[detailColIdx]?.v;
-                        if (isNotEmpty(detailValue)) {
+                        if (isNotEmpty(row.c[detailIdx]?.v)) {
                             totalCases++;
-                            if (isNotEmpty(row.c[closedByColIdx]?.v)) completedCases++;
+                            if (isNotEmpty(row.c[closedIdx]?.v)) completedCases++;
+                            else notifyCount++; 
                         }
                     });
                 }
-                
-                return { total: totalCases, completed: completedCases, notifyCount: notifyCount, extra: extra, lastUpdate: new Date().toLocaleTimeString('th-TH'), error: false };
-            } catch (err) {
-                return { total: 0, completed: 0, error: true };
-            }
+                return { total: totalCases, completed: completedCases, notifyCount: notifyCount, extra: extra, error: false };
+            } catch (err) { return { total: 0, completed: 0, error: true }; }
         }
 
         async function updateDashboard(isAuto = false) {
             if (isFetching) return;
             isFetching = true;
-            const idInput = document.getElementById('sheet-input');
-            const savedId = localStorage.getItem('mflow_sheet_id');
-            const id = spreadsheetId || extractId(idInput.value) || savedId;
             
-            if (!id) { isFetching = false; return; }
-
+            const mainInput = document.getElementById('sheet-input-main');
+            const manualInput = document.getElementById('sheet-input-manual');
+            const mId = extractId(mainInput.value) || localStorage.getItem('mflow_main_id');
+            const manId = extractId(manualInput.value) || localStorage.getItem('mflow_manual_id');
+            
+            if (!mId) { isFetching = false; return; }
+            
             const refreshIcon = document.getElementById('refresh-icon');
             if (refreshIcon) refreshIcon.classList.add('animate-spin');
-
-            spreadsheetId = id;
-            localStorage.setItem('mflow_sheet_id', id);
             
-            document.getElementById('sheet-input').classList.add('hidden');
+            localStorage.setItem('mflow_main_id', mId);
+            if (manId) localStorage.setItem('mflow_manual_id', manId);
+            
+            document.getElementById('config-inputs').classList.add('hidden');
             document.getElementById('refresh-btn').classList.add('hidden');
             document.getElementById('action-btns').classList.remove('hidden');
             document.getElementById('summary-widget').classList.remove('hidden');
-
+            
             const results = {};
-            let totalOverall = 0;
-            let completedOverall = 0;
-
-            for (const name of targetSheets) {
-                const data = await fetchSheetData(id, name);
-                notifications[name] = (name === "L") ? (data.notifyCount > 0) : (data.total > data.completed);
-                if (data.total === 0 || data.error) notifications[name] = false;
+            let totalOverall = 0, completedOverall = 0, alprNotify = false;
+            const orderedVisibleSheets = [];
+            
+            // ดึงข้อมูลแผ่นงานที่ซ่อนอยู่ (Background)
+            for (const name of hiddenMainSheets) {
+                const data = await fetchMainSheetData(mId, name);
                 results[name] = data;
-
-                if (!data.error) {
-                    totalOverall += data.total;
+                if (!data.error) { 
+                    totalOverall += data.total; 
                     completedOverall += data.completed;
+                    // ตรวจสอบการแจ้งเตือน ALPR
+                    if (name === "AL อนุมัติผิด" && data.notifyCount > 0) {
+                        alprNotify = true;
+                    }
                 }
             }
-
-            dashboardData = results;
-            updateSummaryWidget(totalOverall, completedOverall);
+            
+            if (manId) {
+                const manData = await fetchManualData(manId);
+                results["Log Manual"] = manData;
+                notifications["Log Manual"] = manData.notify; 
+                if (!manData.error) { totalOverall += manData.total; completedOverall += manData.completed; }
+                orderedVisibleSheets.push("Log Manual");
+            }
+            
+            for (const name of visibleMainSheets) {
+                const data = await fetchMainSheetData(mId, name);
+                notifications[name] = data.notifyCount > 0;
+                
+                if (data.total === 0 || data.error) notifications[name] = false;
+                results[name] = data;
+                if (!data.error) { totalOverall += data.total; completedOverall += data.completed; }
+                orderedVisibleSheets.push(name);
+            }
+            
+            dashboardData = { order: orderedVisibleSheets, data: results };
+            updateSummaryWidget(totalOverall, completedOverall, alprNotify);
             renderCards();
             
-            document.getElementById('last-refresh-text').innerText = `อัปเดตแล้ว · ${new Date().toLocaleTimeString('th-TH')}`;
+            document.getElementById('last-refresh-text').innerText = `อัปเดต: ${new Date().toLocaleTimeString('th-TH')}`;
             if (refreshIcon) refreshIcon.classList.remove('animate-spin');
-            
             initLucide();
             isFetching = false;
             countdown = 30;
             startTimer();
         }
 
-        function updateSummaryWidget(total, done) {
+        function updateSummaryWidget(total, done, showAlprAlert) {
             const percent = total > 0 ? Math.round((done / total) * 100) : 0;
             document.getElementById('summary-total-cases').innerText = total.toLocaleString();
             document.getElementById('summary-total-done').innerText = done.toLocaleString();
             document.getElementById('summary-total-percent-text').innerText = percent + '%';
             document.getElementById('summary-total-percent').innerText = percent + '%';
+            document.getElementById('summary-circle-progress').setAttribute('stroke-dasharray', `${percent}, 100`);
             
-            const circleProgress = document.getElementById('summary-circle-progress');
-            circleProgress.setAttribute('stroke-dasharray', `${percent}, 100`);
+            const alprContainer = document.getElementById('alpr-alert-container');
+            const performanceLabel = document.getElementById('performance-label');
+            if (showAlprAlert) {
+                alprContainer.classList.remove('hidden');
+                performanceLabel.classList.add('hidden');
+            } else {
+                alprContainer.classList.add('hidden');
+                performanceLabel.classList.remove('hidden');
+            }
         }
 
         function renderCards() {
             const grid = document.getElementById('dashboard-grid');
             grid.innerHTML = '';
-
-            Object.entries(dashboardData).forEach(([name, data]) => {
+            dashboardData.order.forEach((name) => {
+                const data = dashboardData.data[name];
                 const isNotified = notifications[name];
                 const percent = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
-                
                 const card = document.createElement('div');
-                card.className = `group relative glass-card rounded-xl border transition-all duration-500 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5 hover:border-indigo-500/30'}`;
+                card.className = `glass-card rounded-xl border transition-all duration-500 overflow-hidden ${isNotified ? 'notification-border' : 'border-white/5 hover:border-indigo-500/30'}`;
                 
-                let footerContent = '';
-                if (name !== "L" && data.extra > 0) {
-                    footerContent = `<span class="bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded text-[8px]">เพิ่มเติม: ${data.extra}</span>`;
+                let footer = '';
+                if (name === "Log Manual" && isNotified) {
+                    footer = `<span class="bg-orange-500/10 text-orange-300 px-1.5 py-0.5 rounded text-[9px] font-black tracking-tighter">แถวที่: ${data.alertRows.join(', ')}</span>`;
+                } else if (name !== "L" && data.extra > 0) {
+                    footer = `<span class="bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded text-[8px] font-bold italic">ADD: ${data.extra}</span>`;
                 }
-
+                
                 card.innerHTML = `
                     <div class="p-3">
-                        <div class="flex justify-between items-start mb-2.5">
-                            <div class="space-y-0.5">
-                                <p class="text-[9px] font-extrabold uppercase tracking-[0.3em] ${isNotified ? 'text-orange-400/90' : 'text-indigo-400/90'}">LOG</p>
-                                <h3 class="text-[11px] font-black text-white truncate max-w-[90px]">${name}</h3>
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="space-y-0">
+                                <p class="text-[8px] font-extrabold uppercase tracking-widest ${isNotified ? 'text-orange-400/90' : 'text-indigo-400/90'}">SOURCE</p>
+                                <h3 class="text-[11px] font-black text-white truncate max-w-[100px] uppercase italic leading-tight">${name}</h3>
                             </div>
-                            <div class="p-1 rounded-lg ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/80 text-slate-500'} transition-colors">
-                                <i data-lucide="${isNotified ? 'bell' : 'shield-check'}" class="w-3 h-3 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
+                            <div class="p-1 rounded-lg ${isNotified ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800/80 text-slate-500'} shadow-sm">
+                                <i data-lucide="${isNotified ? 'bell' : 'shield-check'}" class="w-3.5 h-3.5 ${isNotified ? 'animate-bounce-slow' : ''}"></i>
                             </div>
                         </div>
-
-                        ${data.error ? 
-                            `<div class="py-4 text-center text-slate-600 text-[10px] font-bold italic">OFFLINE</div>` : 
-                            `<div class="space-y-2.5">
-                                <div class="grid grid-cols-2 gap-1.5">
-                                    <div class="p-1.5 rounded-lg bg-slate-900/50 border border-white/5 transition-colors">
-                                        <p class="text-[8px] font-extrabold text-slate-400 uppercase mb-0.5">ทั้งหมด</p>
-                                        <p class="text-base font-black text-white leading-none">${data.total}</p>
-                                    </div>
-                                    <div class="p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-right">
-                                        <p class="text-[8px] font-extrabold text-emerald-600/70 uppercase mb-0.5">เสร็จสิ้น</p>
-                                        <p class="text-base font-black text-emerald-400 leading-none">${data.completed}</p>
-                                    </div>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <div class="p-2 rounded-lg bg-slate-950/40 border border-white/5">
+                                <p class="text-[8px] font-extrabold text-slate-500 uppercase mb-0.5">TOTAL</p>
+                                <p class="text-base font-black text-white leading-none tracking-tight">${data.total}</p>
+                            </div>
+                            <div class="p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-right">
+                                <p class="text-[8px] font-extrabold text-emerald-600/70 uppercase mb-0.5">DONE</p>
+                                <p class="text-base font-black text-emerald-400 leading-none tracking-tight">${data.completed}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-end px-0.5">
+                                <span class="text-[8px] font-extrabold text-slate-500 uppercase tracking-widest">SUCCESS</span>
+                                <span class="text-[10px] font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'} italic tracking-tighter">${percent}%</span>
+                            </div>
+                            <div class="h-2.5 progress-container rounded-full">
+                                <div class="h-full rounded-full progress-bar-premium bg-gradient-to-r ${isNotified ? 'from-orange-600 to-amber-400 glow-orange' : 'from-indigo-600 to-blue-500 glow-indigo'}" style="width: ${percent}%">
+                                    <div class="glossy-top"></div>
                                 </div>
-
-                                <div class="space-y-1">
-                                    <div class="flex justify-between items-end">
-                                        <span class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wide">ความสำเร็จ</span>
-                                        <span class="text-[10px] font-black ${isNotified ? 'text-orange-400' : 'text-indigo-400'}">${percent}%</span>
-                                    </div>
-                                    <div class="h-2 progress-container rounded-full overflow-hidden p-[1px]">
-                                        <div class="h-full rounded-full progress-bar-smart ${isNotified ? 'bg-gradient-to-r from-orange-600 to-amber-500' : 'bg-gradient-to-r from-indigo-700 to-indigo-400'}" style="width: ${percent}%"></div>
-                                    </div>
-                                </div>
-
-                                <div class="pt-1.5 border-t border-white/5 flex items-center justify-end">
-                                   ${footerContent}
-                                </div>
-                            </div>`
-                        }
+                            </div>
+                        </div>
+                        <div class="pt-1.5 border-t border-white/5 flex items-center justify-end min-h-[24px]">${footer}</div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -455,7 +530,7 @@
             timer = setInterval(() => {
                 if (isFetching) return;
                 countdown--;
-                document.getElementById('countdown').innerText = countdown;
+                if (document.getElementById('countdown')) document.getElementById('countdown').innerText = countdown;
                 if (countdown <= 0) updateDashboard(true);
             }, 1000);
         }
@@ -463,28 +538,24 @@
         document.getElementById('refresh-btn').addEventListener('click', () => updateDashboard(false));
         document.getElementById('instant-refresh-btn').addEventListener('click', () => updateDashboard(false));
         document.getElementById('edit-btn').addEventListener('click', () => {
-            document.getElementById('sheet-input').classList.remove('hidden');
+            document.getElementById('config-inputs').classList.remove('hidden');
             document.getElementById('refresh-btn').classList.remove('hidden');
             document.getElementById('action-btns').classList.add('hidden');
-            if (timer) clearInterval(timer);
+            clearInterval(timer);
         });
         document.getElementById('reset-btn').addEventListener('click', () => {
-            spreadsheetId = ''; localStorage.removeItem('mflow_sheet_id');
-            dashboardData = {}; notifications = {};
-            if (timer) clearInterval(timer);
-            document.getElementById('sheet-input').value = '';
-            document.getElementById('sheet-input').classList.remove('hidden');
-            document.getElementById('refresh-btn').classList.remove('hidden');
-            document.getElementById('action-btns').classList.add('hidden');
-            document.getElementById('summary-widget').classList.add('hidden');
-            document.getElementById('dashboard-grid').innerHTML = '';
-            initLucide();
+            localStorage.clear();
+            location.reload();
         });
 
         window.onload = () => { 
             initLucide(); 
-            const savedId = localStorage.getItem('mflow_sheet_id');
-            if (savedId) { spreadsheetId = savedId; updateDashboard(true); }
+            const savedMain = localStorage.getItem('mflow_main_id');
+            if (savedMain) {
+                document.getElementById('sheet-input-main').value = savedMain;
+                document.getElementById('sheet-input-manual').value = localStorage.getItem('mflow_manual_id') || '';
+                updateDashboard(true);
+            }
         };
     </script>
 </body>
